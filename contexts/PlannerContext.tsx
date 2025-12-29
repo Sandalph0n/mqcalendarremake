@@ -1,5 +1,5 @@
 'use client';
-import { createContext, useContext, useState } from "react";
+import React ,{ createContext, useContext, useState } from "react";
 
 type PlannerProps = {
 	year: number,
@@ -24,18 +24,24 @@ type PlannerProps = {
 };
 
 
-export const PlannerContext = createContext<PlannerProps | undefined>(undefined);
+type PlannerContextValue = {
+  planner: PlannerProps | null;
+  setPlanner: React.Dispatch<React.SetStateAction<PlannerProps | null>>;
+};
 
-export function PlannerProvider(){
-	const [planner, setPlanner] = useState(null);
+const PlannerContext = createContext<PlannerContextValue | null>(null);
 
-	return{
-		
 
-	}
 
+
+export function PlannerProvider({children}: {children: React.ReactNode}){
+  const [planner, setPlanner] = useState<PlannerProps | null>(null);
+  return (
+    <PlannerContext.Provider value={{planner, setPlanner}}>
+      {children}
+    </PlannerContext.Provider>
+  );
 }
-
 
 export function usePlanner(){
   const plannerContext = useContext(PlannerContext);
@@ -47,3 +53,4 @@ export function usePlanner(){
   return plannerContext;
 
 }
+
