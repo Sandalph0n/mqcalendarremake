@@ -2,6 +2,7 @@
   "name": "mqcalendarremake",
   "version": "0.1.0",
   "private": true,
+  "description": "Assignment Planner Ppplication for Macquarie University students",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -17,7 +18,7 @@
     "lucide-react": "^0.562.0",
     "next": "16.1.1",
     "next-themes": "^0.4.6",
-    "react": "19.2.3",
+    "react": "^19.2.3",
     "react-dom": "19.2.3",
     "tailwind-merge": "^3.4.0"
   },
