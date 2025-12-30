@@ -46,6 +46,7 @@ export default function Home() {
           aria-hidden
           className="absolute inset-0 h-full w-full object-cover grayscale-50 filter blur-sm"
           fill
+          loading="eager"
         />
         {/* red-pink cover */}
         <div className="absolute inset-0 opacity-80 hero-image" />

@@ -41,21 +41,17 @@ const SiteHeader = () => {
 	const pathName = usePathname()
 	const { theme, resolvedTheme } = useTheme();
 
-
-
   const current = resolvedTheme || theme; // handles 'system'
   const logo = current === "dark" ? DarkLogo : LightLogo;
 
-	useEffect(()=>{
-		console.log("theme: ", theme);
-		console.log("resolvedTheme: ", resolvedTheme);
-	},[theme, resolvedTheme]);
+	// useEffect(()=>{
+	// 	console.log("theme: ", theme);
+	// 	console.log("resolvedTheme: ", resolvedTheme);
+	// },[theme, resolvedTheme]);
 
-
-
-	const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
-  if (!mounted) return null; // stop render if not yet mounted, avoid mismatch
+	// const [mounted, setMounted] = useState(false);
+  // useEffect(() => setMounted(true), []);
+  // if (!mounted) return null; // stop render if not yet mounted, avoid mismatch
 
 
 	return (
@@ -65,7 +61,12 @@ const SiteHeader = () => {
 				<div>
 					<Link href="/">
 						<div className='flex items-center'>
-							<Image src={logo} alt = "Macquarie logo" className='w-auto h-15 my-3'/>
+							<Image 
+								src={logo} 
+								alt = "Macquarie logo" 
+								className='w-auto h-15 my-3'
+								loading='eager'
+							/>
 							{/* <span className='text-xl font-bold'>AssignmentPlanner</span> */}
 						</div>
 					</Link>

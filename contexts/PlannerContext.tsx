@@ -1,10 +1,12 @@
 'use client';
-import React ,{ createContext, useContext, useState } from "react";
+import React ,{ createContext, useContext, useState, useEffect } from "react";
+import Settings from "@/config/AppSetting" 
 
-type PlannerProps = {
-	year: number,
-	session: number,
-	subjects: {
+
+export type PlannerProps = {
+	year?: number,
+	session?: number,
+	subjects?: {
 		[subjectId: number] : {
 			unitCode: string
 			unitName: string
@@ -24,18 +26,53 @@ type PlannerProps = {
 };
 
 
-type PlannerContextValue = {
-  planner: PlannerProps | null;
-  setPlanner: React.Dispatch<React.SetStateAction<PlannerProps | null>>;
-};
 
+
+
+
+type PlannerContextValue = {
+	planner: PlannerProps | null
+	setPlanner: React.Dispatch<React.SetStateAction<PlannerProps | null>>
+}
 const PlannerContext = createContext<PlannerContextValue | null>(null);
 
 
+export function getStorageValue(): PlannerProps | null{
+	try{
+      const raw = localStorage.getItem(Settings.STORAGE_KEY);
+      if (raw){
+        return(JSON.parse(raw));
+      }
+  }
+	catch(err){
+		return null;
+	}
+	return null;
+} 
 
 
 export function PlannerProvider({children}: {children: React.ReactNode}){
-  const [planner, setPlanner] = useState<PlannerProps | null>(null);
+  const [planner, setPlanner] = useState<PlannerProps | null>(() => {
+    try{
+      return getStorageValue()
+    }
+    catch(err){
+      console.error("Failed to load planner from localStorage", err);
+    }
+    return null;
+  });
+
+  // persist vào localStorage khi state đổi
+  useEffect(() => {
+    if (!planner) return;
+    try{
+      localStorage.setItem(Settings.STORAGE_KEY, JSON.stringify(planner));
+    }
+    catch(err){
+      console.error("Failed to save planner to localStorage", err);
+    }
+  }, [planner]);
+
   return (
     <PlannerContext.Provider value={{planner, setPlanner}}>
       {children}
@@ -53,4 +90,3 @@ export function usePlanner(){
   return plannerContext;
 
 }
-

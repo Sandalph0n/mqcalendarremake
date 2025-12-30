@@ -5,7 +5,7 @@ import "./globals.css";
 import {Inter} from "next/font/google";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
-
+import { PlannerProvider } from "@/contexts/PlannerContext";
 
 
 const inter = Inter({subsets:["latin"]})
@@ -37,11 +37,13 @@ export default function RootLayout({
           defaultTheme="dark"
           // enableSystem  
         >
-          <div className="min-h-screen flex flex-col">
-            <SiteHeader/>
-            <main className="flex-1">{children}</main>
-            <SiteFooter/>
-          </div>
+          <PlannerProvider>
+            <div className="min-h-screen flex flex-col">
+              <SiteHeader/>
+              <main className="flex-1">{children}</main>
+              <SiteFooter/>
+            </div>
+          </PlannerProvider>
         </ThemeProvider>
       </body>
     </html>
