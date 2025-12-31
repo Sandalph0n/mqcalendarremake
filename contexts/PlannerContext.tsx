@@ -1,11 +1,17 @@
 'use client';
 import React ,{ createContext, useContext, useState, useEffect } from "react";
 import Settings from "@/config/AppSetting" 
+import { PeriodMileStoneKey } from "@/lib/data/MacquarieCalendarEntry";
+
+export type MilestoneMap = Partial<Record<PeriodMileStoneKey, string>>;
 
 
 export type PlannerProps = {
 	year?: number,
 	session?: number,
+	milestone?: MilestoneMap,
+	milestoneKeys?: string[],
+	
 	subjects?: {
 		[subjectId: number] : {
 			unitCode: string
