@@ -38,7 +38,7 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
-      <section id="hero" className="relative w-full h-[90vh] flex items-center bg-gray-300 overflow-hidden" aria-label="Homepage hero">
+      <section id="hero" className="relative w-full min-h-[90vh] flex items-center bg-gray-300 overflow-hidden" aria-label="Homepage hero">
         {/* Background image element so we can apply filters */}
         <Image
           src="/backgrounds/hero-image.png"
@@ -69,7 +69,7 @@ export default function Home() {
       </section>
 
       {/* Feature Section */}
-      <section id="roadmap" className="py-16 bg-background h-lvh items-center flex">
+      <section id="roadmap" className="py-16 bg-background min-h-lvh items-center flex">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center">
             <p className="text-sm font-semibold uppercase tracking-wide text-primary">Roadmap</p>
@@ -123,7 +123,7 @@ export default function Home() {
       </section>
 
       {/* How it works */}
-      <section id="how-it-works" className="py-16 bg-secondary text-secondary-foreground h-lvh flex items-center">
+      <section id="how-it-works" className="py-16 bg-secondary text-secondary-foreground min-h-lvh flex items-center">
         <div className="max-w-6xl mx-auto px-6 space-y-8">
           <div className="max-w-3xl space-y-2 text-center mx-auto">
             <p className="text-sm font-semibold uppercase tracking-wide text-primary">How this app works</p>
