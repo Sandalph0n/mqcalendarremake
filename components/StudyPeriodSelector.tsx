@@ -120,7 +120,7 @@ const StudyPeriodSelector = () => {
 	}
 
 	return (
-		<Card className="relative w-full overflow-hidden border-none bg-linear-to-br from-background via-background/70 to-[#f2ede3] shadow-lg">
+		<Card className="relative w-full overflow-hidden border-none bg-linear-to-br from-background via-background/70 to-[#f2ede3] dark:to-primary  shadow-lg">
 			<div className="absolute left-0 top-0 h-full w-1 bg-primary" aria-hidden />
 			<CardHeader className="relative flex flex-col gap-3">
 				<div className="flex items-center gap-3">
@@ -150,7 +150,7 @@ const StudyPeriodSelector = () => {
 									type="number"
 									min={Settings.period_year_min}
 									max={Settings.period_year_max}
-									className="w-full rounded-md border px-3 py-2 bg-white/80"
+									className="w-full rounded-md border px-3 py-2 bg-white/80 dark:bg-secondary/80 dark:text-white/80"
 									value={year}
 									onChange={(e) => setYear(e.target.value)}
 									placeholder="e.g. 2025"
@@ -162,7 +162,7 @@ const StudyPeriodSelector = () => {
 									type="number"
 									min={Settings.period_session_min}
 									max={Settings.period_session_max}
-									className="w-full rounded-md border px-3 py-2 bg-white/80"
+									className="w-full rounded-md border px-3 py-2 bg-white/80 dark:bg-secondary/80 dark:text-white/80"
 									value={session}
 									onChange={(e) => setSession(e.target.value)}
 									placeholder="e.g. 2"

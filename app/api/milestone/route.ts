@@ -1,12 +1,11 @@
 import { NextResponse, NextRequest } from "next/server";
 import {
-  getMileStoneByPeriod,
-  PERIOD_MILESTONE_KEYS,
-  PeriodMileStoneKey,
-  PeriodMileStoneProps
+    getMileStoneByPeriod,
+    PERIOD_MILESTONE_KEYS,
+    PeriodMileStoneKey,
+    PeriodMileStoneProps,
 } from "@/lib/data/MacquarieCalendarEntry";
 import { arch } from "os";
-
 
 // type ParsedEntry = {
 //   studyPeriod: string;
@@ -14,9 +13,6 @@ import { arch } from "os";
 //   date: string; // ISO yyyy-mm-dd
 //   originalDate: string;
 // };
-
-
-
 
 // function parseDate(d: string): string | null {
 //   const parts = d.split("/").map((p) => p.trim());
@@ -91,53 +87,57 @@ import { arch } from "os";
 // }
 
 export type MileStoneAPIProps = NextResponse<{
-  year: number,
-  session: number,
-  milestone: PeriodMileStoneProps,
-  key: PeriodMileStoneKey
+    year: number;
+    session: number;
+    milestone: PeriodMileStoneProps;
+    key: PeriodMileStoneKey;
 } | null>;
 
-
 export async function POST(req: NextRequest) {
-  try {
-    const body = await req.json();
-    const year = Number(body?.year);
-    const session = Number(body?.session);
+    try {
+        const body = await req.json();
+        const year = Number(body?.year);
+        const session = Number(body?.session);
 
-    if (!Number.isFinite(year) || !Number.isFinite(session)) {
-      return NextResponse.json(
-        { error: "Invalid payload", message: "year and session must be numbers" },
-        { status: 400 }
-      );
+        if (!Number.isFinite(year) || !Number.isFinite(session)) {
+            return NextResponse.json(
+                {
+                    error: "Invalid payload",
+                    message: "year and session must be numbers",
+                },
+                { status: 400 }
+            );
+        }
+
+        const milestone = getMileStoneByPeriod(year, session);
+        if (!milestone) {
+            return NextResponse.json(
+                {
+                    error: "Not Found",
+                    message: "No milestone found for given year/session",
+                },
+                { status: 404 }
+            );
+        }
+
+        return NextResponse.json({
+            year,
+            session,
+            milestone,
+            keys: PERIOD_MILESTONE_KEYS,
+        });
+    } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        return NextResponse.json(
+            { error: "Internal Server Error", message },
+            { status: 500 }
+        );
     }
-
-    const milestone = getMileStoneByPeriod(year, session);
-    if (!milestone) {
-      return NextResponse.json(
-        { error: "Not Found", message: "No milestone found for given year/session" },
-        { status: 404 }
-      );
-    }
-
-    return NextResponse.json({
-      year,
-      session,
-      milestone,
-      keys: PERIOD_MILESTONE_KEYS,
-    });
-  } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
-    return NextResponse.json(
-      { error: "Internal Server Error", message },
-      { status: 500 }
-    );
-  }
 }
 
 export function GET() {
-  return NextResponse.json(
-    { error: "Method Not Allowed" },
-    { status: 405, statusText: "Method Not Allowed" }
-  );
+    return NextResponse.json(
+        { error: "Method Not Allowed" },
+        { status: 405, statusText: "Method Not Allowed" }
+    );
 }
-

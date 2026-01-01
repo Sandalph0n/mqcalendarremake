@@ -4,7 +4,28 @@ import Settings from "@/config/AppSetting"
 import { PeriodMileStoneKey } from "@/lib/data/MacquarieCalendarEntry";
 
 export type MilestoneMap = Partial<Record<PeriodMileStoneKey, string>>;
+export type AssignmentProps = {
+	name?: string
+	weighting?: number
+	isWeekly?: boolean
+	isHurdle?: boolean 
+	isExam?: boolean,
+	dueText?: string
+	dueDate?: string
+	dueWeek?: number
+	anchor?: string
+}
 
+
+export type SubjectProps=  {
+	year?: number
+	session?: number
+	unitCode?: string
+	unitName?: string
+	unitGuideURL?: string
+	assignments?: AssignmentProps[]
+	
+}
 
 export type PlannerProps = {
 	year?: number,
@@ -13,21 +34,7 @@ export type PlannerProps = {
 	milestoneKeys?: string[],
 	
 	subjects?: {
-		[subjectId: number] : {
-			unitCode: string
-			unitName: string
-			unitGuideURL: string
-			assignments: {
-				[asmId: string]: {
-					name: string
-					weighting: number
-					isHurdle: boolean 
-					dueDate?: string
-					dueWeek: number
-					anchor: string					
-				}
-			}
-		}
+		[subjectId: number] : SubjectProps
 	}
 };
 

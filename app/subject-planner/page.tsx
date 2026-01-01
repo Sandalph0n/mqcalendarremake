@@ -13,12 +13,12 @@ const SubjectPlannerPage = () => {
 	const hasStudyPeriod = Boolean(planner?.year && planner?.session);
 
 
-	
+
 	return (
 		<div className='flex flex-col min-h-screen items-center px-4 py-10 bg-linear-to-b from-background via-background to-muted/40'>
 			<div className="w-full max-w-6xl flex flex-col gap-16">
 				<section id="study-period" className="w-full relative">
-					<StudyPeriodSelector/>
+					<StudyPeriodSelector />
 				</section>
 
 				{!hasStudyPeriod && (
@@ -29,7 +29,7 @@ const SubjectPlannerPage = () => {
 
 				<div
 					className={cn(
-						"flex flex-col gap-16 transition-all duration-500 ease-out overflow-hidden",
+						"flex flex-col gap-16 transition-all duration-500 ease-out overflow-visible",
 						hasStudyPeriod
 							? "opacity-100 translate-y-0 max-h-1000"
 							: "opacity-0 -translate-y-4 max-h-0 pointer-events-none"
@@ -37,12 +37,14 @@ const SubjectPlannerPage = () => {
 					aria-hidden={!hasStudyPeriod}
 				>
 					<section id="generic-calender" className="w-full relative">
-						<GenericCalendar/>
+						<GenericCalendar />
 					</section>
-					
-					<section id="subject-planner" className="w-full relative">
-						<SubjectPlanner/>
+
+					<section id="subject-planner" className="w-full relative ">
+						<SubjectPlanner />
 					</section>
+
+
 				</div>
 			</div>
 		</div>
