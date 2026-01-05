@@ -1,6 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
-import { JSDOM } from "jsdom";
 import { AssignmentProps, SubjectProps } from "@/contexts/PlannerContext";
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 // Hàm dùng chung: fetch Unit Guide và parse thành SubjectProps
 
@@ -8,6 +9,7 @@ import { AssignmentProps, SubjectProps } from "@/contexts/PlannerContext";
 export async function fetchSubjectFromUnitGuide(
     subjectURL: string
 ): Promise<SubjectProps> {
+    const { JSDOM } = await import("jsdom");
     const result: SubjectProps = {};
 
     const unitGuide = await fetch(subjectURL, { cache: "no-store" });

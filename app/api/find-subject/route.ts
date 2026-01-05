@@ -1,10 +1,13 @@
 import { NextResponse, NextRequest } from "next/server";
 
-import {JSDOM} from "jsdom" 
 import { fetchSubjectFromUnitGuide } from "../fetch-subject/route";
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 
 export async function POST(req: NextRequest){
+    const { JSDOM } = await import("jsdom");
     try{
         const body = await req.json();
         const year = Number(body?.year);
