@@ -3,6 +3,8 @@ import { JSDOM } from "jsdom";
 import { AssignmentProps, SubjectProps } from "@/contexts/PlannerContext";
 
 // Hàm dùng chung: fetch Unit Guide và parse thành SubjectProps
+
+
 export async function fetchSubjectFromUnitGuide(
     subjectURL: string
 ): Promise<SubjectProps> {
@@ -84,9 +86,11 @@ export async function fetchSubjectFromUnitGuide(
             | undefined;
         const dueText = dueCell?.textContent?.trim() || "";
         parsedAsm.dueText = dueText;
-        parsedAsm.isExam = /exam/.test(
-            `${parsedAsm.name} ${dueText}`.toLowerCase()
-        );
+        // parsedAsm.isExam = /exam/.test(
+        //     `${parsedAsm.name} ${dueText}`.toLowerCase()
+        // );
+
+        parsedAsm.isExam = false
 
         const weeklyText = `${parsedAsm.name} ${parsedAsm.dueText}`.toLowerCase();
         parsedAsm.isWeekly = weeklyText.includes("weekly");
@@ -118,6 +122,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ subject });
     } catch (err) {
         const message = err instanceof Error ? err.message : String(err);
+        console.log(message)
         return NextResponse.json(
             { error: "Internal Server Error", message },
             { status: 500 }

@@ -2,6 +2,7 @@
 import React ,{ createContext, useContext, useState, useEffect } from "react";
 import Settings from "@/config/AppSetting" 
 import { PeriodMileStoneKey } from "@/lib/data/MacquarieCalendarEntry";
+import { TimePeriod } from "@/lib/timeUtils";
 
 export type MilestoneMap = Partial<Record<PeriodMileStoneKey, string>>;
 export type AssignmentProps = {
@@ -14,6 +15,25 @@ export type AssignmentProps = {
 	dueDate?: string
 	dueWeek?: number
 	anchor?: string
+}
+
+export type SessionCalendarProps = {
+	week:{ 
+		[week: number  ]: { 
+			startDate?: Date
+			endDate?: Date
+			weekLabel?: string[]
+			events?: Partial<Record<PeriodMileStoneKey, string>>
+			hasStudyPeriod?: boolean
+			hasRecessPeriod?: boolean
+			hasExamPeriod?: boolean
+		}
+		
+	}
+	firstHalf?: TimePeriod
+	recess?: TimePeriod
+	secondHalf?: TimePeriod
+	examPeriod?: TimePeriod
 }
 
 
@@ -30,12 +50,11 @@ export type SubjectProps=  {
 export type PlannerProps = {
 	year?: number,
 	session?: number,
+	calendar?: SessionCalendarProps,
 	milestone?: MilestoneMap,
 	milestoneKeys?: string[],
-	
-	subjects?: {
-		[subjectId: number] : SubjectProps
-	}
+	subjects: SubjectProps[],
+	orders?: string[],
 };
 
 
@@ -44,18 +63,18 @@ export type PlannerProps = {
 
 
 type PlannerContextValue = {
-	planner: PlannerProps | null
-	setPlanner: React.Dispatch<React.SetStateAction<PlannerProps | null>>
+	planner: PlannerProps 
+	setPlanner: React.Dispatch<React.SetStateAction<PlannerProps >>
 }
 const PlannerContext = createContext<PlannerContextValue | null>(null);
 
 
 export function getStorageValue(): PlannerProps | null{
 	try{
-      const raw = localStorage.getItem(Settings.STORAGE_KEY);
-      if (raw){
-        return(JSON.parse(raw));
-      }
+		const raw = localStorage.getItem(Settings.STORAGE_KEY);
+		if (raw){
+			return(JSON.parse(raw));
+		}
   }
 	catch(err){
 		return null;
@@ -65,14 +84,17 @@ export function getStorageValue(): PlannerProps | null{
 
 
 export function PlannerProvider({children}: {children: React.ReactNode}){
-  const [planner, setPlanner] = useState<PlannerProps | null>(() => {
+  const [planner, setPlanner] = useState<PlannerProps>(() => {
+		const defaultPlanner = {
+				subjects: []
+			};
     try{
-      return getStorageValue()
+      return getStorageValue() ?? defaultPlanner
     }
     catch(err){
       console.error("Failed to load planner from localStorage", err);
     }
-    return null;
+    return defaultPlanner;
   });
 
   // persist vào localStorage khi state đổi

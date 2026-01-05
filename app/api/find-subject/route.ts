@@ -43,7 +43,7 @@ export async function POST(req: NextRequest){
                 const matchUnit = subject.unitCode?.toLowerCase().trim() === unitCode.toLowerCase().trim();
 
                 if (matchYear && matchSession && matchUnit){
-                    return NextResponse.json({ subject, url });
+                    return NextResponse.json({ subject });
                 }
             }
             catch(err){
@@ -59,6 +59,8 @@ export async function POST(req: NextRequest){
     }
     catch(err){
         const message = err instanceof Error ? err.message : String(err);
+        console.log(message)
+
         return NextResponse.json(
             { error: "Internal Server Error", message },
             { status: 500 }

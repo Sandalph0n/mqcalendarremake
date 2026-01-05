@@ -7,221 +7,160 @@ import {
 	CardDescription,
 	CardHeader,
 	CardTitle,
-} from "@/components/ui/card"
-import React, { useMemo } from 'react'
+} from "@/components/ui/card";
+import React, { useMemo } from "react";
 import { usePlanner } from "@/contexts/PlannerContext";
-import { PERIOD_MILESTONE_KEYS } from "@/lib/data/MacquarieCalendarEntry";
+import { formatDateAU, toDate } from "@/lib/timeUtils";
 
-const SYDNEY_TZ = "Australia/Sydney";
-const MS_PER_DAY = 24 * 60 * 60 * 1000;
-const weekdayFormatter = new Intl.DateTimeFormat("en-AU", { weekday: "short", timeZone: SYDNEY_TZ });
-const dateKeyFormatter = new Intl.DateTimeFormat("en-CA", { timeZone: SYDNEY_TZ });
-
-type TimelineRow = {
-	date: Date;
+type WeekRow = {
+	weekNumber: number;
 	weekLabel: string;
-	events: string[];
+	rows: Array<{
+		date?: Date;
+		eventLabel?: string;
+	}>;
 };
-
-// Lấy offset phút giữa một instant UTC và cách hiển thị tại timezone Sydney (để tái tạo 00:00 Sydney)
-function getTimeZoneOffsetMinutes(instant: Date, timeZone: string): number {
-	const dtf = new Intl.DateTimeFormat("en-AU", {
-		timeZone,
-		hour12: false,
-		year: "numeric",
-		month: "2-digit",
-		day: "2-digit",
-		hour: "2-digit",
-		minute: "2-digit",
-		second: "2-digit",
-	});
-	const parts = dtf.formatToParts(instant);
-	const map: Record<string, string> = {};
-	for (const { type, value } of parts) {
-		map[type] = value;
-	}
-	const asUTC = Date.UTC(
-		Number(map.year),
-		Number(map.month) - 1,
-		Number(map.day),
-		Number(map.hour),
-		Number(map.minute),
-		Number(map.second)
-	);
-	return (asUTC - instant.getTime()) / 60000;
-}
-
-// Khóa ngày theo Sydney (yyyy-mm-dd) để gom sự kiện
-function dateKeySydney(date: Date) {
-	return dateKeyFormatter.format(date); // yyyy-mm-dd
-}
-
-// Từ khóa yyyy-mm-dd (Sydney) tạo lại instant tại 00:00 Sydney
-function dateFromSydneyKey(key: string): Date {
-	const [y, m, d] = key.split("-").map(Number);
-	const utcBase = Date.UTC(y, m - 1, d);
-	const offsetMinutes = getTimeZoneOffsetMinutes(new Date(utcBase), SYDNEY_TZ);
-	return new Date(utcBase - offsetMinutes * 60_000);
-}
-
-// Tiện ích parse Date an toàn
-function toDate(value?: string): Date | null {
-	if (!value) return null;
-	const d = new Date(value);
-	return Number.isNaN(d.getTime()) ? null : d;
-}
-
-// Cộng ngày đơn giản (theo milliseconds)
-function addDays(date: Date, days: number) {
-	return new Date(date.getTime() + days * MS_PER_DAY);
-}
-
-// Format ngày AU (Sydney) cho bảng
-function formatDateAU(date: Date) {
-	return date.toLocaleDateString("en-AU", {
-		weekday: "short",
-		day: "2-digit",
-		month: "short",
-		year: "numeric",
-		timeZone: SYDNEY_TZ,
-	});
-}
-
-function getWeekLabel(date: Date, start: Date, recessStart: Date | null, recessEnd: Date | null) {
-	const inRecess =
-		recessStart && recessEnd && date >= recessStart && date <= recessEnd;
-
-	if (inRecess && recessStart) {
-		const delta = Math.floor((date.getTime() - recessStart.getTime()) / MS_PER_DAY);
-		const recessWeek = Math.floor(delta / 7) + 1;
-		return `Recess Week ${recessWeek}`;
-	}
-
-	let elapsedDays = Math.floor((date.getTime() - start.getTime()) / MS_PER_DAY);
-
-	if (recessStart && recessEnd && date > recessEnd) {
-		const recessLengthDays =
-			Math.floor((recessEnd.getTime() - recessStart.getTime()) / MS_PER_DAY) + 1;
-		elapsedDays -= recessLengthDays;
-	}
-
-	const week = Math.floor(elapsedDays / 7) + 1;
-	return `Week ${week}`;
-}
-
-// Tìm thứ Hai trong tuần của một ngày (nếu không có, trả về chính ngày đó)
-function findMondayOfWeek(day: Date): Date {
-	for (let i = 0; i < 7; i++) {
-		const candidate = addDays(day, i);
-		if (weekdayFormatter.format(candidate) === "Mon") {
-			return candidate;
-		}
-	}
-	return day;
-}
 
 const GenericCalendar = () => {
 	const { planner } = usePlanner();
+	const calendar = planner.calendar;
 
-	const timeline = useMemo(() => {
-		const milestone = planner?.milestone ?? {};
+	const rows = useMemo<WeekRow[]>(() => {
+		if (!calendar?.week) return [];
+		const result: WeekRow[] = [];
 
-		const start = toDate(milestone["study period start"]);
-		if (!start) return { rows: [] as TimelineRow[], ready: false, reason: "Missing study period start" };
+		for (const [weekKey, weekData] of Object.entries(calendar.week)) {
+			const weekNumber = Number(weekKey);
+			if (Number.isNaN(weekNumber)) continue;
 
-		const end =
-			toDate(milestone["study period end"]) ||
-			toDate(milestone["exams end"]) ||
-			addDays(start, 120);
-		const recessStart = toDate(milestone["recess start"]);
-		const recessEnd = toDate(milestone["recess end"]);
+			const labels = weekData.weekLabel?.length ? weekData.weekLabel.join(" • ") : `Week ${weekNumber}`;
+			const monday = weekData.startDate ? new Date(weekData.startDate) : undefined;
+			const dayMap = new Map<string, { date?: Date; events: string[] }>();
 
-		const eventByDate: Record<string, string[]> = {};
-		for (const key of PERIOD_MILESTONE_KEYS) {
-			const val = milestone[key];
-			const d = toDate(val);
-			if (!d) continue;
-			const keyStr = dateKeySydney(d);
-			if (!eventByDate[keyStr]) eventByDate[keyStr] = [];
-			eventByDate[keyStr].push(key);
-		}
+			let fallbackCounter = 0;
+			// Helper to create stable keys
+			const dateKey = (d?: Date, fallback?: string) =>
+				d ? d.toISOString().slice(0, 10) : fallback ?? `no-date-${weekNumber}-${fallbackCounter++}`;
 
-		const rows: TimelineRow[] = [];
-		const weekMap: Record<string, { date: Date; weekLabel: string; events: string[] }> = {};
+			// Ensure Monday row exists (even without events)
+			const mondayKey = dateKey(monday, `week-${weekNumber}-monday`);
+			dayMap.set(mondayKey, { date: monday, events: [] });
 
-		// First, map all milestone events to their weeks (keep duplicates)
-		for (const key of Object.keys(eventByDate).sort()) {
-			const day = dateFromSydneyKey(key);
-			const weekLabel = getWeekLabel(day, start, recessStart, recessEnd);
-			if (!weekMap[weekLabel]) {
-				weekMap[weekLabel] = { date: new Date(day), weekLabel, events: [] };
+			// Events: group by date key so multiple events on same day share one row
+			if (weekData.events) {
+				for (const [name, val] of Object.entries(weekData.events)) {
+					const d = toDate(val);
+					const key = dateKey(d!, `week-${weekNumber}-${name}`);
+					if (!dayMap.has(key)) {
+						dayMap.set(key, { date: d ?? undefined, events: [] });
+					}
+					dayMap.get(key)!.events.push(name);
+				}
 			}
-			weekMap[weekLabel].events.push(...(eventByDate[key] ?? []));
-			// prefer Monday as representative if available
-			if (weekdayFormatter.format(day) === "Mon") {
-				weekMap[weekLabel].date = new Date(day);
-			}
+
+			const dayRows = Array.from(dayMap.values());
+
+			// Sort rows by date to keep Monday/top-of-week first when dates are present
+			dayRows.sort((a, b) => {
+				if (!a.date && !b.date) return 0;
+				if (!a.date) return 1;
+				if (!b.date) return -1;
+				return a.date.getTime() - b.date.getTime();
+			});
+
+			result.push({
+				weekNumber,
+				weekLabel: labels,
+				rows: dayRows.map((row) => ({
+					date: row.date,
+					eventLabel: row.events.join(", "),
+				})),
+			});
 		}
 
-		// Then, ensure every week in range exists (empty weeks get Monday as date)
-		for (let day = new Date(start); day <= end; day = addDays(day, 7)) {
-			const weekLabel = getWeekLabel(day, start, recessStart, recessEnd);
-			if (!weekMap[weekLabel]) {
-				const monday = findMondayOfWeek(day);
-				weekMap[weekLabel] = { date: monday, weekLabel, events: [] };
-			}
-		}
+		result.sort((a, b) => a.weekNumber - b.weekNumber);
+		return result;
+	}, [calendar?.week]);
 
-		for (const row of Object.values(weekMap).sort((a, b) => a.date.getTime() - b.date.getTime())) {
-			rows.push({ date: row.date, weekLabel: row.weekLabel, events: row.events });
-		}
-
-		return { rows, ready: true, reason: "" };
-	}, [planner?.milestone]);
-
-	const hasData = timeline.ready && timeline.rows.length > 0;
+	const hasData = rows.length > 0;
 
 	return (
-		<Card className="relative w-full overflow-hidden border-none bg-secondary/90 text-secondary-foreground shadow-lg">
-			<div className="absolute inset-0 bg-gradient-to-br from-primary/15 via-accent/10 to-secondary/40 pointer-events-none" />
+		<Card className="relative w-full overflow-hidden border border-border bg-card text-card-foreground shadow-sm">
+			<div className="absolute inset-0 bg-gradient-to-br from-background via-muted/40 to-background opacity-90 pointer-events-none" />
 			<CardHeader className="relative flex flex-col gap-2">
 				<CardTitle className="text-xl">Study Milestone Calendar</CardTitle>
-				<CardDescription className="text-secondary-foreground/80">
-					Shows each day with its study week / recess week and any milestones.
+				<CardDescription className="text-muted-foreground">
+					Weekly view with Monday anchor and milestone events.
 				</CardDescription>
 			</CardHeader>
-			<CardContent>
+			<CardContent className="relative space-y-4">
 				{!hasData ? (
-					<div className="rounded-md border border-dashed border-secondary/40 bg-secondary/20 px-4 py-3 text-sm text-secondary-foreground/80">
+					<div className="rounded-md border border-dashed border-border bg-muted/20 px-4 py-3 text-sm text-muted-foreground">
 						Set a study period and fetch milestones to view the calendar.
 					</div>
 				) : (
-					<div className="overflow-auto rounded-lg border border-secondary/30 bg-secondary/20">
-						<table className="w-full text-sm">
-							<thead className="bg-secondary/40 text-secondary-foreground">
-								<tr>
-									<th className="px-4 py-2 text-left font-semibold">Date</th>
-									<th className="px-4 py-2 text-left font-semibold">Week</th>
-									<th className="px-4 py-2 text-left font-semibold">Event</th>
-								</tr>
-							</thead>
-							<tbody>
-								{timeline.rows.map((row) => (
-									<tr key={row.date.toISOString()} className="odd:bg-secondary/10">
-										<td className="px-4 py-2 whitespace-nowrap">{formatDateAU(row.date)}</td>
-										<td className="px-4 py-2">{row.weekLabel}</td>
-										<td className="px-4 py-2">
-											{row.events.length > 0 ? row.events.join(", ") : "—"}
-										</td>
+					<div className="overflow-hidden rounded-xl border border-border bg-card/90">
+						<div className="overflow-auto">
+							<table className="w-full text-sm">
+								<thead className="bg-muted text-foreground">
+									<tr>
+										<th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide border-r border-border/60">Week</th>
+										<th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide border-r border-border/60">Date (Mon+Events)</th>
+										<th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide">Event</th>
 									</tr>
-								))}
-							</tbody>
-						</table>
+								</thead>
+								<tbody>
+									{rows.map((week) =>
+										week.rows.map((day, idx) => {
+											const isWeekHeader = idx === 0;
+											return (
+												<tr
+													key={`${week.weekNumber}-${idx}`}
+													className="border-t border-border/60 bg-card"
+												>
+													{isWeekHeader ? (
+														<td
+															className="px-4 py-3 border-r border-border/60 align-middle"
+															rowSpan={week.rows.length}
+														>
+															<div className="flex flex-col items-start justify-center gap-2">
+																<span className="inline-flex w-fit items-center gap-2 rounded-lg bg-primary/15 px-3 py-1 text-xs font-semibold text-primary">
+																	{week.weekLabel}
+																</span>
+																{/* <span className="text-[11px] text-muted-foreground">
+																	Week #{week.weekNumber}
+																</span> */}
+															</div>
+														</td>
+													) : null}
+													<td className="px-4 py-3 whitespace-nowrap border-r border-border/60 align-middle">
+														{day.date ? (
+															<span className="font-medium">{formatDateAU(day.date)}</span>
+														) : (
+															<span className="text-muted-foreground">—</span>
+														)}
+													</td>
+													<td className="px-4 py-3">
+														{day.eventLabel && day.eventLabel.length > 0 ? (
+															<span className="inline-flex items-center gap-2 rounded-lg bg-primary/12 px-3 py-1 text-xs font-semibold text-primary">
+																{day.eventLabel}
+															</span>
+														) : (
+															<span className="text-muted-foreground">—</span>
+														)}
+													</td>
+												</tr>
+											);
+										})
+									)}
+								</tbody>
+							</table>
+						</div>
 					</div>
 				)}
 			</CardContent>
 		</Card>
-	)
-}
+	);
+};
 
-export default GenericCalendar
+export default GenericCalendar;

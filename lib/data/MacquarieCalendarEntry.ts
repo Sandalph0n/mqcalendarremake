@@ -1,3 +1,4 @@
+import {dateFromSydneyLocalTime } from "../timeUtils";
 
 
 export type RawCalendarEntry = {
@@ -17,94 +18,6 @@ export type ParsedCalendarEntry = {
     date_parsed: Date;
 }
 
-const SYDNEY_TZ = "Australia/Sydney";
-
-
-/**
- * Tính offset múi giờ (tính bằng phút) giữa UTC và một IANA timezone (vd: "Australia/Sydney")
- * tại đúng thời điểm (instant) được truyền vào.
- *
- * Vì sao phải làm vòng vèo?    
- * - `Intl.DateTimeFormat` KHÔNG có API trả thẳng offset.
- * - Nó chỉ cho ta "các phần" (year/month/day/hour/minute/second) khi nhìn instant đó dưới timezone target.
- * - Ta sẽ:
- *   (1) format instant theo timezone target → lấy ra các con số địa phương
- *   (2) ghép các con số đó lại thành một timestamp UTC "giả" (coi giờ địa phương như là UTC)
- *   (3) lấy chênh lệch giữa UTC giả và UTC thật → ra offset.
- *
- * Lưu ý:
- * - Hàm này tự xử lý DST (Daylight Saving Time) vì `Intl` tính đúng theo timezone.
- * - Offset được trả về theo PHÚT (vì có timezone lệch 30/45 phút, không chỉ tròn giờ).
- */
-function getTimeZoneOffsetMinutes(instant: Date, timeZone: string): number {
-    const dtf = new Intl.DateTimeFormat("en-AU", {
-        timeZone,
-        hour12: false,
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-    });
-
-    // Bẻ string format thành từng phần để lấy ra số (year/month/day/hour/minute/second)
-    const parts = dtf.formatToParts(instant);
-    const map: Record<string, string> = {};
-    for (const { type, value } of parts) {
-        map[type] = value;
-    }
-
-    // Dựng một timestamp UTC "giả": coi các số địa phương (theo timezone target)
-    // như là chúng đang ở UTC.
-    const asUTC = Date.UTC(
-        Number(map.year),
-        Number(map.month) - 1,
-        Number(map.day),
-        Number(map.hour),
-        Number(map.minute),
-        Number(map.second),
-    );
-
-    // Chênh lệch (ms) giữa UTC giả và epoch ms thật của instant.
-    // Chia 60_000 để đổi ms → phút (đơn vị tự nhiên của timezone offset).
-    return (asUTC - instant.getTime()) / 60_000;
-}
-
-/**
- * Tạo `Date` (UTC instant) từ một thời điểm được hiểu theo GIỜ ĐỊA PHƯƠNG Australia/Sydney.
- *
- * Mục tiêu:
- * - Input: (y, m, d, h, min, s, ms) được hiểu là "giờ Sydney".
- * - Output: một `Date` đại diện đúng INSTANT đó (lưu theo UTC epoch ms),
- *          bất kể code chạy ở Sydney/Mỹ/Châu Âu...
- *
- * Vì sao không dùng `new Date(y, m-1, d, ...)`?
- * - `new Date(...)` sẽ hiểu theo timezone MÁY đang chạy (local machine/server), nên deploy ở đâu là sai ở đó.
- *
- * Cách làm:
- * (1) tạo một mốc UTC "trung tính" bằng `Date.UTC(...)` (không phụ thuộc timezone máy)
- * (2) tính offset của Australia/Sydney tại mốc đó (DST-aware)
- * (3) trừ offset để ra instant UTC đúng tương ứng với giờ Sydney.
- */
-export function dateFromSydneyLocalTime(
-    y: number,
-    m1to12: number,
-    d: number,
-    h = 0,
-    min = 0,
-    s = 0,
-    ms = 0,
-): Date {
-    // (1) Mốc UTC trung tính: coi các số input như đang ở UTC.
-    const utcBase = Date.UTC(y, m1to12 - 1, d, h, min, s, ms);
-
-    // (2) Offset của Sydney tại instant này (tính theo phút, có DST)
-    const offsetMin = getTimeZoneOffsetMinutes(new Date(utcBase), SYDNEY_TZ);
-
-    // (3) Trừ offset để ra instant UTC thật tương ứng với giờ Sydney input.
-    return new Date(utcBase - offsetMin * 60_000);
-}
 
 
 
@@ -394,7 +307,7 @@ export function getMileStoneByPeriod(year: number, session: number) : PeriodMile
     
 
     for (let i = 0; i < ParsedCalendarEntries.length; i ++) {
-        const pe = ParsedCalendarEntries[i];
+        const pe = ParsedCalendarEntries[i]!;
         // the period start year alway the same, but the end period day might be in the next year, apply for session 3
         if (year !== pe.year || session != pe.session) {
             continue;
@@ -404,7 +317,7 @@ export function getMileStoneByPeriod(year: number, session: number) : PeriodMile
             result["study period start"] = pe.date_parsed;
             for (let j = i+1; j < ParsedCalendarEntries.length; j ++){
                 
-                const nextRec = ParsedCalendarEntries[j];
+                const nextRec = ParsedCalendarEntries[j]!;
                 if ((year !== nextRec.year && year !== nextRec.year - 1) || session != nextRec.session) {
                     
                     continue;
@@ -412,7 +325,7 @@ export function getMileStoneByPeriod(year: number, session: number) : PeriodMile
                 if (isPeriodMileStoneKey(nextRec.date_name)) {
                     result[nextRec.date_name] = nextRec.date_parsed;
                 }
-                if (nextRec.date_name.toLowerCase().trim() === "study period end".toLowerCase().trim()){
+                if (nextRec.date_name.toLowerCase().trim() === "exams end".toLowerCase().trim()){
                     return result;
                 }
             }

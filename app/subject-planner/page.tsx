@@ -1,7 +1,7 @@
 'use client';
 
-import GenericCalendar from "@/components/GenericCalendar";
 import StudyPeriodSelector from "@/components/StudyPeriodSelector";
+import GenericCalendar from "@/components/GenericCalendar";
 import SubjectPlanner from "@/components/SubjectPlanner";
 import { usePlanner } from "@/contexts/PlannerContext";
 import { cn } from "@/lib/utils";

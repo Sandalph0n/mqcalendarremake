@@ -15,11 +15,10 @@ import { cn } from "@/lib/utils";
 import Settings from "@/config/AppSetting"
 import { MilestoneMap, usePlanner } from "@/contexts/PlannerContext";
 import { CalendarClock, ShieldCheck } from "lucide-react";
-
+import { milestoneToCalendar } from "@/lib/calendarUtils";
 
 const StudyPeriodSelector = () => {
 	const {planner, setPlanner} = usePlanner()
-	console.log(planner);
 	const [year, setYear] = useState<string>(()=>{
 		try {
 			if (!planner){
@@ -88,14 +87,25 @@ const StudyPeriodSelector = () => {
 				milestone?: MilestoneMap;
 				keys?: string[];
 			};
+			
+			if (!data.milestone){
+				throw Error("Can not find milestone")
+			}
+
+			const milestoneCalendar = milestoneToCalendar(data.milestone) ;
+			if (!milestoneCalendar){
+				throw Error("Can not find calendar")
+			}
 
 			setPlanner((p) => ({
 				...(p ?? { subjects: {} }),
 				year: data.year,
 				session: data.session,
 				milestone: data.milestone ,
-				milestoneKeys: data.keys  ,
+				milestoneKeys: data.keys,
+				calendar: milestoneCalendar
 			}));
+
 
 			setIsSaved(true);
 		}
@@ -116,6 +126,7 @@ const StudyPeriodSelector = () => {
 			session: undefined,
 			milestone: undefined,
 			milestoneKeys: undefined,
+			subjects: []
 		}))
 	}
 
@@ -134,7 +145,7 @@ const StudyPeriodSelector = () => {
 				</div>
 				<div className="flex items-center gap-2 text-xs text-muted-foreground">
 					<ShieldCheck className="size-4 text-primary" />
-					<span>Validated against AppSetting ({Settings.period_year_min}-{Settings.period_year_max}).</span>
+					<span>Works better for sessions 1 and 2 from 2026 onwards..</span>
 				</div>
 			</CardHeader>
 			<CardContent>
