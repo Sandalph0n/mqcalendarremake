@@ -21,10 +21,10 @@ export function milestoneToCalendar(milestone: MilestoneMap): SessionCalendarPro
     }
 
     // Validate Monday using Date.getDay(): 1 = Monday, 0 = Sunday
-    if (startPeriod.getDay() !== 1) {
-        console.log("start date is not monday");
-        return null;
-    }
+    // if (startPeriod.getDay() !== 1) {
+    //     console.log("start date is not monday");
+    //     return null;
+    // }
 
     // Normalize to local-midnight (date-only) so we can do safe calendar arithmetic.
     const start = new Date(
