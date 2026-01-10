@@ -89,7 +89,7 @@ const AssignmentCard = ({ assignment, index, subjectIndex, unitGuideURL }: Assig
 			</div>
 			{/* To do task for student */}
 
-			<div className="my-2 rounded-2xl bg-destructive/20 mx-20 p-3 border border-dashed border-primary">
+			<div className="my-2 rounded-2xl bg-destructive/20 mx-auto p-3 border border-dashed border-primary w-fit">
 				<p className="text-sm text-muted-foreground text-center">
 						Please read carefully the due date from Unit Guide (Quoted above) and put it mannually bellow
 				</p>
