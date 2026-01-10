@@ -78,7 +78,7 @@ const StudyPeriodSelector = () => {
 			});
 
 			if (!res.ok){
-				throw new Error(`Cannot find milestones for year ${yr}, session ${ss}`);
+				throw new Error(`Error ${res.status}: Cannot find milestones for year ${yr}, session ${ss}`);
 			}
 
 			const data = await res.json() as {
@@ -94,7 +94,7 @@ const StudyPeriodSelector = () => {
 
 			const milestoneCalendar = milestoneToCalendar(data.milestone) ;
 			if (!milestoneCalendar){
-				throw Error("Can not find calendar")
+				throw Error("Can not create calendar")
 			}
 
 			setPlanner((p) => ({
@@ -112,9 +112,9 @@ const StudyPeriodSelector = () => {
 		catch(err){
 			console.error(err);
 			setIsSaved(false);
-			setError(`Cannot find milestones for session ${ss} year ${yr}.`);
+			const message = err instanceof Error ? err.message : String(err);
+			setError(message);
 		}
-
 	}
 
 	function handleReset() {

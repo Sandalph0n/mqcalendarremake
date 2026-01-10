@@ -103,7 +103,7 @@ export async function POST(req: NextRequest) {
             return NextResponse.json(
                 {
                     error: "Invalid payload",
-                    message: "year and session must be numbers",
+                    message: `year and session must be numbers, got year: ${year} /session: ${session}`,
                 },
                 { status: 400 }
             );
@@ -114,7 +114,7 @@ export async function POST(req: NextRequest) {
             return NextResponse.json(
                 {
                     error: "Not Found",
-                    message: "No milestone found for given year/session",
+                    message: `No milestone found for given year/session, got year: ${year} /session: ${session}`,
                 },
                 { status: 404 }
             );
