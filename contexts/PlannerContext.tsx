@@ -1,6 +1,6 @@
 'use client';
 import React ,{ createContext, useContext, useState, useEffect } from "react";
-import Settings from "@/config/AppSetting" 
+import Settings from "@/config/AppSetting"
 import { PeriodMileStoneKey } from "@/lib/data/MacquarieCalendarEntry";
 import { TimePeriod } from "@/lib/timeUtils";
 
@@ -23,6 +23,7 @@ export type SessionCalendarProps = {
 			startDate?: Date
 			endDate?: Date
 			weekLabel?: string[]
+			weekLabelShort?: string[]
 			events?: Partial<Record<PeriodMileStoneKey, string>>
 			hasStudyPeriod?: boolean
 			hasRecessPeriod?: boolean

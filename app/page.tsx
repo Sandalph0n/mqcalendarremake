@@ -13,24 +13,28 @@ export default function Home() {
       title: "Plan and manage your assignments",
       description: "Collect unit guides, capture every task, and keep everything organised in one place.",
       cta: "Start planning",
+      href: "/subject-planner",
       icon: LayoutList,
     },
     {
       title: "Visualize your plan",
       description: "Generate a heatmap calendar so you know exactly when the workload spikes.",
       cta: "See calendar",
+      href: "/calendar",
       icon: CalendarRange,
     },
     {
       title: "Offload your plan",
       description: "Save to your device and reload offline after the first visit—no retyping required.",
       cta: "Enable offline",
+      href: "/offload",
       icon: CloudDownload,
     },
     {
       title: "Integrate in your app",
       description: "Use the public API to pull calendar data into your own tools or dashboards.",
       cta: "View docs",
+      href: "/doc",
       icon: GitBranch,
     },
   ];
@@ -109,9 +113,16 @@ export default function Home() {
                       </CardHeader>
                       <CardContent className="flex flex-col gap-4 pt-0 h-full">
                         <CardDescription className="flex-1 text-sm">{feature.description}</CardDescription>
-                        <Button variant="secondary" className="w-full">
-                          {feature.cta}
-                        </Button>
+                          <Button
+                            asChild
+                            variant="secondary" className="w-full"
+                          >
+                            <Link
+                              href = {feature.href}
+                            >
+                              {feature.cta}
+                            </Link>
+                          </Button>
                       </CardContent>
                     </Card>
                   </div>

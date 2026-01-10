@@ -12,10 +12,17 @@ type Props = {
 };
 
 const SubjectCard = ({ subject, index }: Props) => {
-	const [isOpen, setIsOpen] = useState(true);
+	const assignments = subject.assignments ?? [];
+	const [isOpen, setIsOpen] = useState(() => {
+		for (const asm of assignments) {
+			if (!asm.dueWeek && !asm.dueDate) {
+				return true;
+			}
+		}
+		return false;
+	});
 	const { setPlanner } = usePlanner();
 	const code = (subject.unitCode || `Subject ${index + 1}`).toUpperCase().trim();
-	const assignments = subject.assignments ?? [];
 	const unitGuideURL = subject.unitGuideURL;
 
 	function handleDeleteSubject(e: React.MouseEvent<HTMLButtonElement>) {
@@ -31,14 +38,9 @@ const SubjectCard = ({ subject, index }: Props) => {
 		<div className="relative w-full overflow-hidden rounded-2xl border border-border bg-card shadow-lg">
 			<div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-primary via-accent to-secondary" />
 			<div className="flex items-start justify-between gap-3 p-5">
-				<button
-					type="button"
-					className="flex flex-1 flex-col gap-2 rounded-xl p-1 text-left transition-colors hover:bg-muted/50"
-					onClick={(e) => {
-						if (!unitGuideURL) return;
-						e.preventDefault();
-						window.open(unitGuideURL, "_blank", "noopener,noreferrer");
-					}}
+				<div
+					className="flex flex-1 flex-col gap-2 rounded-xl p-1 text-left transition-colors"
+
 				>
 					<div className="flex flex-wrap items-center gap-3">
 						<div className="rounded-xl bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
@@ -56,11 +58,18 @@ const SubjectCard = ({ subject, index }: Props) => {
 						{subject.unitName || "Untitled subject"}
 					</p>
 					{unitGuideURL && (
-						<div className="inline-flex items-center gap-1 text-xs font-semibold text-primary underline underline-offset-4">
+						<div className="inline-flex items-center gap-1 text-xs font-semibold text-primary underline underline-offset-4 hover:cursor-pointer"
+							onClick={(e) => {
+								if (!unitGuideURL) return;
+								e.preventDefault();
+								window.open(unitGuideURL, "_blank", "noopener,noreferrer");
+							}}
+						>
+
 							Open Unit Guide <ExternalLink className="size-3.5" />
 						</div>
 					)}
-				</button>
+				</div>
 				<div className="flex flex-col items-end gap-2">
 					<div className="mt-auto">
 						<ChevronDown
@@ -76,9 +85,8 @@ const SubjectCard = ({ subject, index }: Props) => {
 			</div>
 
 			<div
-				className={`grid overflow-hidden transition-all duration-300 ease-out ${
-					isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
-				}`}
+				className={`grid overflow-hidden transition-all duration-300 ease-out ${isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+					}`}
 			>
 				<div className="overflow-hidden border-t border-border bg-muted/40">
 					<div className="space-y-3 p-5">

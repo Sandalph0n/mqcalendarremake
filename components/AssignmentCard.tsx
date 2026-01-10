@@ -1,9 +1,11 @@
 'use client';
 
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { AssignmentProps, usePlanner } from "@/contexts/PlannerContext";
 import { ExternalLink } from "lucide-react";
 import { Button } from "./ui/button";
+import { dateFromSydneyKey, dateFromSydneyLocalTime, isBetweenDates, isBetweenPeriod } from "@/lib/timeUtils";
+
 
 type AssignmentCardProps = {
 	assignment: AssignmentProps;
@@ -30,6 +32,18 @@ const AssignmentCard = ({ assignment, index, subjectIndex, unitGuideURL }: Assig
 	}, [planner.calendar?.week]);
 
 	function updateAssignment(updates: Partial<AssignmentProps>) {
+		if (updates.dueDate){
+			
+			const auDate = dateFromSydneyKey(updates.dueDate)
+			
+			for(const w in planner.calendar!.week){
+				if (isBetweenDates(new Date(planner.calendar!.week[w].startDate!), new Date(planner.calendar!.week[w].endDate!), auDate)){
+					updates.dueWeek = Number(w)
+					break
+				}
+			}
+		}
+		
 		setPlanner((prev) => {
 			const subjects = [...(prev?.subjects ?? [])];
 			const currentSubject = subjects[subjectIndex];
@@ -42,8 +56,10 @@ const AssignmentCard = ({ assignment, index, subjectIndex, unitGuideURL }: Assig
 			subjects[subjectIndex] = { ...currentSubject, assignments: nextAssignments };
 			return { ...(prev ?? {}), subjects };
 		});
-		console.log(planner)
+
 	}
+
+	
 
 	function handleModeChange(nextMode: "date" | "week") {
 		setMode(nextMode);

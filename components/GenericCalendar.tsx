@@ -90,7 +90,7 @@ const GenericCalendar = () => {
 			<CardHeader className="relative flex flex-col gap-2">
 				<CardTitle className="text-xl">Study Milestone Calendar</CardTitle>
 				<CardDescription className="text-muted-foreground">
-					Weekly view with Monday anchor and milestone events.
+					Weekly view with labels and milestone events.
 				</CardDescription>
 			</CardHeader>
 			<CardContent className="relative space-y-4">
@@ -105,7 +105,7 @@ const GenericCalendar = () => {
 								<thead className="bg-muted text-foreground">
 									<tr>
 										<th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide border-r border-border/60">Week</th>
-										<th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide border-r border-border/60">Date (Mon+Events)</th>
+										<th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide border-r border-border/60">Date</th>
 										<th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide">Event</th>
 									</tr>
 								</thead>

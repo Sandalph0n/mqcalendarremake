@@ -51,6 +51,7 @@ export function milestoneToCalendar(milestone: MilestoneMap): SessionCalendarPro
                 startDate: undefined,
                 endDate: undefined,
                 weekLabel: [],
+                weekLabelShort: [],
                 events: {},
                 hasStudyPeriod: false,
                 hasRecessPeriod: false,
@@ -115,16 +116,22 @@ export function milestoneToCalendar(milestone: MilestoneMap): SessionCalendarPro
                 if (period === result.firstHalf || period === result.secondHalf){
                     result.week[w].hasStudyPeriod = true;
                     result.week[w].weekLabel?.push("Study W" + studyWeekCount)
+                    result.week[w].weekLabelShort?.push("W" + studyWeekCount)
+
                     studyWeekCount++;
                 }
                 else if (period === result.recess){
                     result.week[w].hasRecessPeriod = true;
                     result.week[w].weekLabel?.push("Recess W" + recessWeekCount)
+                    result.week[w].weekLabelShort?.push("R" + recessWeekCount)
+
                     recessWeekCount++;
                 }
                 else if (period === result.examPeriod){
                     result.week[w].hasExamPeriod = true;
                     result.week[w].weekLabel?.push("Exam W" + examWeekCount)
+                    result.week[w].weekLabelShort?.push("E" + examWeekCount)
+
                     examWeekCount++;
                 }
             }

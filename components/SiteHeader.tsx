@@ -20,8 +20,8 @@ import { ModeToggle } from './ModeToggle';
 const navigation = [
 	{name: "Home", href: "/"},
 	{name: "How To Use", href: "/user-manual"},
-	{name: "Subject Planner", href: "subject-planner"},
-	{name: "Calendar", href: "calendar"},
+	{name: "Subject Planner", href: "/subject-planner"},
+	{name: "Calendar", href: "/calendar"},
 	{name: "About", href: "/about"},
 	{name: "Document", href: "/doc"},
 

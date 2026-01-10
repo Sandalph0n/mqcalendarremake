@@ -5,6 +5,7 @@ import { Button } from "./ui/button";
 import { usePlanner } from '@/contexts/PlannerContext';
 import { SubjectProps } from '@/contexts/PlannerContext';
 import SubjectCard from './SubjectCard';
+import Link from 'next/link';
 
 
 const SubjectPlanner = () => {
@@ -125,11 +126,18 @@ const SubjectPlanner = () => {
 					{planner?.subjects && planner.subjects.length > 0 && (
 						planner.subjects.map(
 							(subject, idx) => (
-								<SubjectCard subject={subject} index={idx} />
+								<SubjectCard key={subject.unitCode || idx} subject={subject} index={idx} />
 							)
 						)
 					)}
 				</div>
+				{planner?.subjects && planner.subjects.length > 0 && (
+					<div className="mt-6 flex justify-center">
+						<Button asChild>
+							<Link href="/calendar">View Calendar</Link>
+						</Button>
+					</div>
+				)}
 			</CardContent>
 		</Card>
 	)
