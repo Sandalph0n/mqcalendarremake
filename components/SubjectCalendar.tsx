@@ -155,9 +155,14 @@ const SubjectCalendar = () => {
 						))}
 						{todayPercent !== null && (
 							<div
-								className="absolute top-0 bottom-0 w-[2px] bg-primary/70"
-								style={{ left: `${todayPercent}%` }}
-							/>
+              className="absolute pointer-events-none"
+              style={{ left: `${subjectColWidth}`, right: 0, top: 0, bottom: 0 }}
+            >
+              <div
+                className="absolute top-0 bottom-0 w-[2px] bg-primary/70"
+                style={{ left: `${todayPercent}%` }}
+              />
+            </div>
 						)}
 					</div>
 					{/* Top-left header (sticky) */}
