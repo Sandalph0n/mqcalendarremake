@@ -2,13 +2,14 @@
 
 import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import SubjectCalendar from "@/components/SubjectCalendar";
-import SemesterCalendar from "@/components/SemesterCalendar";
+import SubjectCalendar from "@/components/SubjectHeatmap";
+import SemesterCalendar from "@/components/SemesterHeatmap";
 import GenericCalendar from "@/components/GenericCalendar";
 import { usePlanner } from "@/contexts/PlannerContext";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle , CardFooter} from "@/components/ui/card";
+import SummaryCalendar from "@/components/SummaryCalendar";
 
 const CalendarPage = () => {
 	const { planner } = usePlanner();
@@ -29,7 +30,7 @@ const CalendarPage = () => {
 					<CardHeader className="space-y-2">
 						<CardTitle className="text-3xl font-bold tracking-tight">Calendar & Heatmap</CardTitle>
 						<CardDescription>
-							Review workload intensity by subject or across the semester, across with dated milestones.
+							Consider the workload intensity for each subject or across the entire semester to help you create a specific study plan.
 						</CardDescription>
 					</CardHeader>
 					<CardContent className="space-y-6">
@@ -72,7 +73,7 @@ const CalendarPage = () => {
 									
 								</Card>
 
-								<GenericCalendar />
+								<SummaryCalendar />
 							</>
 						)}
 					</CardContent>

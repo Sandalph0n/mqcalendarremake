@@ -6,7 +6,7 @@ import { usePlanner } from '@/contexts/PlannerContext';
 import { SubjectProps } from '@/contexts/PlannerContext';
 import SubjectCard from './SubjectCard';
 import Link from 'next/link';
-
+import { nanoid } from 'nanoid';
 
 const SubjectPlanner = () => {
 	const { planner, setPlanner } = usePlanner();
@@ -54,11 +54,14 @@ const SubjectPlanner = () => {
 			}
 
 			const data = await res.json() as { subject: SubjectProps };
+			const dataWithID = {
+				subject: {...data.subject, id: nanoid()}
+			}
 			setPlanner(prev => {
 				const subjects = prev?.subjects ?? [];
 				return {
 					...(prev ?? {}),
-					subjects: [...subjects, data.subject],
+					subjects: [...subjects, dataWithID.subject],
 				};
 			})
 
@@ -76,6 +79,9 @@ const SubjectPlanner = () => {
 	function handleChangeUnit(event: React.ChangeEvent<HTMLInputElement>) {
 		setUnitCodeInput(event.target.value)
 	}
+	
+	
+
 
 
 	return (
@@ -126,7 +132,7 @@ const SubjectPlanner = () => {
 					{planner?.subjects && planner.subjects.length > 0 && (
 						planner.subjects.map(
 							(subject, idx) => (
-								<SubjectCard key={subject.unitCode || idx} subject={subject} index={idx} />
+								<SubjectCard key={subject.id} subject={subject} index={idx} />
 							)
 						)
 					)}

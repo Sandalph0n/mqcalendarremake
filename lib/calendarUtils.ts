@@ -1,8 +1,8 @@
 
-
+import { Temporal } from "temporal-polyfill";
 import { SessionCalendarProps, MilestoneMap } from "@/contexts/PlannerContext";
-import { toDate, addDaysLocal, isBetweenDates, TimePeriod, isBetweenPeriod } from "./timeUtils";
-import { PERIOD_MILESTONE_KEYS, PeriodMileStoneKey } from "./data/MacquarieCalendarEntry";
+import { isBetweenDates, TimePeriod, isBetweenPeriod, toSydneyPlainDate, toSydneyZonedDateTime, zonedMidnight } from "./timeUtils";
+import { PERIOD_MILESTONE_KEYS } from "./data/MacquarieCalendarEntry";
 
 export function milestoneToCalendar(milestone: MilestoneMap): SessionCalendarProps | null{
     const result: SessionCalendarProps = {
@@ -13,38 +13,36 @@ export function milestoneToCalendar(milestone: MilestoneMap): SessionCalendarPro
         week: {}
     }
 
-    const startPeriod = toDate(milestone["study period start"]) 
-    const endDate = toDate(milestone["exams end"])
+    const startPeriod = toSydneyZonedDateTime(milestone["study period start"]);
+    const endDate = toSydneyZonedDateTime(milestone["exams end"]);
+    
+    // console.log(startPeriod!.toString())
+
+    // return null
     if (!startPeriod || !endDate){
         console.log("Cannot find start date or end date")
         return null;
     }
 
     // Validate Monday using Date.getDay(): 1 = Monday, 0 = Sunday
-    // if (startPeriod.getDay() !== 1) {
-    //     console.log("start date is not monday");
-    //     return null;
-    // }
+    if (startPeriod.dayOfWeek !== 1) {
+        console.log("start date is not monday");
+        return null;
+    }
 
     // Normalize to local-midnight (date-only) so we can do safe calendar arithmetic.
-    const start = new Date(
-        startPeriod.getFullYear(),
-        startPeriod.getMonth(),
-        startPeriod.getDate(),
-        0, 0, 0, 0
-    );
-    const end = new Date(
-        endDate.getFullYear(),
-        endDate.getMonth(),
-        endDate.getDate(),
-        0, 0, 0, 0
-    );
+    
+    
+    const start = zonedMidnight(startPeriod)
+    const end = zonedMidnight(endDate)
 
 
+    // Gắn start date và enddate cho các tuần
     let currentWeek = 1;
     while (true) {
-        const weekStart = addDaysLocal(start, (currentWeek - 1) * 7);
-        if (weekStart > end) break;
+        // const weekStart = addDaysLocal(start, (currentWeek - 1) * 7);
+        const weekStart = start.add({days: ((currentWeek - 1) * 7)})
+        if (Temporal.ZonedDateTime.compare(weekStart, end) > 0) break;
         // initialize the week if not yet existed
         if (!result.week[currentWeek]) {
             result.week[currentWeek] = {
@@ -60,13 +58,18 @@ export function milestoneToCalendar(milestone: MilestoneMap): SessionCalendarPro
         }
         result.week[currentWeek].startDate = weekStart;
         // Keep the same semantics as the old code: endDate is the next Monday at 00:00 (exclusive)
-        result.week[currentWeek].endDate = addDaysLocal(weekStart, 7);
+        result.week[currentWeek].endDate = weekStart.add({days: 7});
+
+        // console.log(result.week[currentWeek].startDate!.dayOfWeek ," ",result.week[currentWeek].startDate!.toString())
+        // console.log(result.week[currentWeek].startDate!.dayOfWeek ," ",result.week[currentWeek].endDate!.toString() )
+        // console.log("==============================")
         currentWeek++;
+
     }
-    
+
     // Iterate with a strongly-typed key list to avoid `string` index errors.
     for (const event of PERIOD_MILESTONE_KEYS ) {
-        const time = toDate(milestone[event]);
+        const time = toSydneyZonedDateTime(milestone[event]);
         if (!event || !time) continue;
         for (const w in result.week){
             if (isBetweenDates(result.week[w].startDate!, result.week[w].endDate!, time)){
@@ -97,7 +100,6 @@ export function milestoneToCalendar(milestone: MilestoneMap): SessionCalendarPro
             }
         }
     }
-
     const mainPeriodType: TimePeriod[] = [
         result.firstHalf!,
         result.recess!,
@@ -137,7 +139,7 @@ export function milestoneToCalendar(milestone: MilestoneMap): SessionCalendarPro
             }
         }
     }
-    
-    
+    console.log("Done")
+
     return result;
 } 

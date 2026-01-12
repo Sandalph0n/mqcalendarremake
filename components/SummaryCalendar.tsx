@@ -12,6 +12,8 @@ import React, { useMemo } from "react";
 import { usePlanner } from "@/contexts/PlannerContext";
 import { Temporal } from "temporal-polyfill";
 import { formatDateAU, toSydneyZonedDateTime } from "@/lib/timeUtils";
+import { SUBJECT_PALETTE } from "./SubjectHeatmap";
+import { cn } from "@/lib/utils";
 
 type WeekRow = {
 	weekNumber: number;
@@ -19,12 +21,22 @@ type WeekRow = {
 	rows: Array<{
 		date?: Temporal.ZonedDateTime;
 		eventLabel?: string;
+		subjectCode?: string;
+		color?: [number, number, number];
+		weighting?: number;
+		isHurdle?: boolean;
+		isExam?: boolean;
+		isWeekly?: boolean;
+		unitGuideURL?: string;
+		anchor?: string;
 	}>;
 };
 
-const GenericCalendar = () => {
+const SummaryCalendar = () => {
 	const { planner } = usePlanner();
+	console.log(planner)
 	const calendar = planner.calendar;
+	const subjects = planner.subjects ?? [];
 
 	const rows = useMemo<WeekRow[]>(() => {
 		if (!calendar?.week) return [];
@@ -49,7 +61,7 @@ const GenericCalendar = () => {
 				dayMap.set(mondayKey, { date: monday, events: [] });
 			}
 
-			// Events: group by date key so multiple events on same day share one row
+			// Events: milestones
 			if (weekData.events) {
 				for (const [name, val] of Object.entries(weekData.events)) {
 					const d = toSydneyZonedDateTime(val);
@@ -81,9 +93,60 @@ const GenericCalendar = () => {
 			});
 		}
 
+		// Add assignments
+		subjects.forEach((subject, sIdx) => {
+			const color = SUBJECT_PALETTE[sIdx % SUBJECT_PALETTE.length];
+			for (const asm of subject.assignments ?? []) {
+				const weekNum =
+					asm.dueWeek ??
+					(() => {
+						const due = toSydneyZonedDateTime(asm.dueDate ?? undefined);
+						if (!due) return null;
+						for (const [wKey, wData] of Object.entries(calendar.week ?? {})) {
+							const wNumber = Number(wKey);
+							if (Number.isNaN(wNumber)) continue;
+							if (wData.startDate && wData.endDate) {
+								const start = toSydneyZonedDateTime(wData.startDate);
+								const end = toSydneyZonedDateTime(wData.endDate);
+								if (start && end && Temporal.ZonedDateTime.compare(due, start) >= 0 && Temporal.ZonedDateTime.compare(due, end) < 0) {
+									return wNumber;
+								}
+							}
+						}
+						return null;
+					})();
+				if (!weekNum || !result.find((r) => r.weekNumber === weekNum)) continue;
+
+				const target = result.find((r) => r.weekNumber === weekNum)!;
+				const dueDate = asm.dueDate ? toSydneyZonedDateTime(asm.dueDate) : undefined;
+				target.rows.push({
+					date: dueDate!,
+					eventLabel: asm.name || "Assignment",
+					subjectCode: subject.unitCode,
+					color,
+					weighting: asm.weighting,
+					isHurdle: asm.isHurdle,
+					isExam: asm.isExam,
+					isWeekly: asm.isWeekly,
+					unitGuideURL: subject.unitGuideURL,
+					anchor: asm.anchor,
+				});
+			}
+		});
+
+		// Ensure consistent ordering within week: milestones (by date) then assignments
+		result.forEach((week) => {
+			week.rows.sort((a, b) => {
+				if (!a.date && !b.date) return 0;
+				if (!a.date) return 1;
+				if (!b.date) return -1;
+				return Temporal.ZonedDateTime.compare(a.date, b.date);
+			});
+		});
+
 		result.sort((a, b) => a.weekNumber - b.weekNumber);
 		return result;
-	}, [calendar?.week]);
+	}, [calendar?.week, subjects]);
 
 	const hasData = rows.length > 0;
 
@@ -91,9 +154,9 @@ const GenericCalendar = () => {
 		<Card className="relative w-full overflow-hidden border border-border bg-card text-card-foreground shadow-sm">
 			<div className="absolute inset-0 bg-gradient-to-br from-background via-muted/40 to-background opacity-90 pointer-events-none" />
 			<CardHeader className="relative flex flex-col gap-2">
-				<CardTitle className="text-xl">Study Milestone Calendar</CardTitle>
+				<CardTitle className="text-xl">Summary Calendar</CardTitle>
 				<CardDescription className="text-muted-foreground">
-					Make sure you choose the right semester; take a quick look at the milestones below.
+					A calendar summarizing important deadlines, along with assignment submission schedules, helps you manage your time better.
 				</CardDescription>
 			</CardHeader>
 			<CardContent className="relative space-y-4">
@@ -143,11 +206,52 @@ const GenericCalendar = () => {
 															<span className="text-muted-foreground">—</span>
 														)}
 													</td>
-													<td className="px-4 py-3">
+													<td className="px-4 py-3 align-middle">
 														{day.eventLabel && day.eventLabel.length > 0 ? (
-															<span className="inline-flex items-center gap-2 rounded-lg bg-primary/12 px-3 py-1 text-xs font-semibold text-primary">
-																{day.eventLabel}
-															</span>
+															<div className="relative inline-flex group">
+																<span
+																	tabIndex={0}
+																	className={cn(
+																		"inline-flex items-center gap-2 rounded-lg px-3 py-1 text-xs font-semibold focus:outline-none",
+																		day.color ? "" : "bg-primary/12 text-primary"
+																	)}
+																	style={
+																		day.color
+																			? {
+																					backgroundColor: `rgba(${day.color[0]}, ${day.color[1]}, ${day.color[2]}, 0.15)`,
+																					color: `rgb(${day.color[0]}, ${day.color[1]}, ${day.color[2]})`,
+																			  }
+																			: undefined
+																	}
+																>
+																	{day.subjectCode ? `${day.subjectCode}: ` : ""}
+																	{day.eventLabel}
+																</span>
+																{day.color && (
+																	<div className="pointer-events-none absolute left-1/2 top-full z-50 hidden w-72 max-w-[18rem] -translate-x-1/2 translate-y-2 rounded-md border border-border bg-card p-3 text-foreground shadow-lg group-hover:block group-focus-within:block">
+																		<div className="text-xs font-semibold mb-1">
+																			{day.subjectCode ? `${day.subjectCode}: ` : ""}
+																			{day.eventLabel}
+																		</div>
+																		<div className="space-y-1 text-xs text-muted-foreground">
+																			{day.weighting !== undefined && <div>Weight: {day.weighting ?? 0}%</div>}
+																			{day.isHurdle !== undefined && <div>Hurdle: {day.isHurdle ? "Yes" : "No"}</div>}
+																			{day.isExam && <div>Exam</div>}
+																			{day.isWeekly && <div>Weekly task</div>}
+																			{day.unitGuideURL && day.anchor && (
+																				<a
+																					className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
+																					href={`${day.unitGuideURL}#${day.anchor}`}
+																					target="_blank"
+																					rel="noreferrer"
+																				>
+																					View in Unit Guide
+																				</a>
+																			)}
+																		</div>
+																	</div>
+																)}
+															</div>
 														) : (
 															<span className="text-muted-foreground">—</span>
 														)}
@@ -166,4 +270,4 @@ const GenericCalendar = () => {
 	);
 };
 
-export default GenericCalendar;
+export default SummaryCalendar;

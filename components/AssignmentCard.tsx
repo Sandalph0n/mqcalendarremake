@@ -4,7 +4,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { AssignmentProps, usePlanner } from "@/contexts/PlannerContext";
 import { ExternalLink } from "lucide-react";
 import { Button } from "./ui/button";
-import { dateFromSydneyKey, dateFromSydneyLocalTime, isBetweenDates, isBetweenPeriod } from "@/lib/timeUtils";
+import { dateFromSydneyKey, isBetweenDates, toSydneyPlainDate, zonedMidnight } from "@/lib/timeUtils";
 
 
 type AssignmentCardProps = {
@@ -16,7 +16,7 @@ type AssignmentCardProps = {
 
 const AssignmentCard = ({ assignment, index, subjectIndex, unitGuideURL }: AssignmentCardProps) => {
 	const [showAdvanced, setShowAdvanced] = useState(false);
-	const [mode, setMode] = useState<"date" | "week">(assignment.dueWeek ? "week" : "date");
+	const [mode, setMode] = useState<"date" | "week">(assignment.dueDate ?  "date" : "week");
 	const { planner, setPlanner } = usePlanner();
 
 	const weekOptions = useMemo(() => {
@@ -35,9 +35,13 @@ const AssignmentCard = ({ assignment, index, subjectIndex, unitGuideURL }: Assig
 		if (updates.dueDate){
 			
 			const auDate = dateFromSydneyKey(updates.dueDate)
-			
+			console.log(updates.dueDate)
+			// return
 			for(const w in planner.calendar!.week){
-				if (isBetweenDates(new Date(planner.calendar!.week[w].startDate!), new Date(planner.calendar!.week[w].endDate!), auDate)){
+
+				const start = dateFromSydneyKey(planner.calendar!.week[w].startDate!.toString());
+				const end = dateFromSydneyKey(planner.calendar!.week[w].endDate!.toString());
+				if (start && end && isBetweenDates(start, end, auDate)){
 					updates.dueWeek = Number(w)
 					break
 				}
@@ -62,6 +66,8 @@ const AssignmentCard = ({ assignment, index, subjectIndex, unitGuideURL }: Assig
 	
 
 	function handleModeChange(nextMode: "date" | "week") {
+		// Khi nhập vào week, thì tự động xoá date
+		// Nhưng khi nhập vào date, thì không được xoá week
 		setMode(nextMode);
 		if (nextMode === "date") {
 			updateAssignment({ dueWeek: undefined, dueDate: assignment.dueDate ?? "" });

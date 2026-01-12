@@ -1,4 +1,5 @@
-import {dateFromSydneyLocalTime } from "../timeUtils";
+import { dateFromSydneyLocalTime } from "../timeUtils";
+import { Temporal } from "temporal-polyfill";
 
 
 export type RawCalendarEntry = {
@@ -13,9 +14,8 @@ export type ParsedCalendarEntry = {
     year: number;
     date: string;
     date_name: string;
-    // `Date` KHÔNG lưu timezone; nó chỉ lưu một "instant" theo UTC epoch milliseconds.
-    // Trường `date_parsed` bên dưới là instant tương ứng với ngày/giờ được hiểu theo Australia/Sydney.
-    date_parsed: Date;
+    // Temporal.ZonedDateTime to preserve timezone context.
+    date_parsed: Temporal.ZonedDateTime;
 }
 
 
@@ -273,14 +273,14 @@ function parseCalendarEntry(): ParsedCalendarEntry[] {
 export const ParsedCalendarEntries: ParsedCalendarEntry[] = parseCalendarEntry();
 
 export type PeriodMileStoneProps = {
-    "study period start"        ?: Date,
-    "recess start"              ?: Date,
-    "recess end"                ?: Date,
-    "session classes resume"    ?: Date,
-    "last day of classes"       ?: Date,
-    "exams start"               ?: Date,
-    "exams end"                 ?: Date,
-    "study period end"          ?: Date,
+    "study period start"        ?: Temporal.PlainDate,
+    "recess start"              ?: Temporal.PlainDate,
+    "recess end"                ?: Temporal.PlainDate,
+    "session classes resume"    ?: Temporal.PlainDate,
+    "last day of classes"       ?: Temporal.PlainDate,
+    "exams start"               ?: Temporal.PlainDate,
+    "exams end"                 ?: Temporal.PlainDate,
+    "study period end"          ?: Temporal.PlainDate,
 
 }
 
@@ -314,7 +314,7 @@ export function getMileStoneByPeriod(year: number, session: number) : PeriodMile
         }
 
         if (pe.date_name.toLowerCase().trim() === "study period start".toLowerCase().trim()) {
-            result["study period start"] = pe.date_parsed;
+            result["study period start"] = pe.date_parsed.toPlainDate();
             for (let j = i+1; j < ParsedCalendarEntries.length; j ++){
                 
                 const nextRec = ParsedCalendarEntries[j]!;
@@ -323,7 +323,7 @@ export function getMileStoneByPeriod(year: number, session: number) : PeriodMile
                     continue;
                 }
                 if (isPeriodMileStoneKey(nextRec.date_name)) {
-                    result[nextRec.date_name] = nextRec.date_parsed;
+                    result[nextRec.date_name] = nextRec.date_parsed.toPlainDate();
                 }
                 if (nextRec.date_name.toLowerCase().trim() === "exams end".toLowerCase().trim()){
                     return result;

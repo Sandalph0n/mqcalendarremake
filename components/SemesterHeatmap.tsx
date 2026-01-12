@@ -1,8 +1,9 @@
 import React from "react";
 import { cn } from "@/lib/utils";
 import { SessionCalendarProps, usePlanner } from "@/contexts/PlannerContext";
-import { addDaysLocal, addTimes, dateFromSydneyLocalTime } from "@/lib/timeUtils";
+import { addDaysLocal, addTimes, plainDateToZonedMidnight, toSydneyPlainDate, toSydneyZonedDateTime, SYDNEY_TZ } from "@/lib/timeUtils";
 import { ExternalLink } from "lucide-react";
+import { Temporal } from "temporal-polyfill";
 
 type CellData = {
   weight: number;
@@ -40,43 +41,48 @@ const SemesterCalendar = () => {
   const gridTemplateRows = `${headerHeight} repeat(${Math.max(subjects.length, 1)}, ${rowHeight})`;
   const gridTemplateCols = `${subjectColWidth} ${weekEntries.map(() => "minmax(2rem,1fr)").join(" ") || "1fr"}`;
   // Change this to test different current day if needed
-  const today = new Date();
+  const today = Temporal.Now.zonedDateTimeISO(SYDNEY_TZ);
 
   const periods = [calendar.firstHalf, calendar.recess, calendar.secondHalf, calendar.examPeriod];
-  const start = new Date(planner.milestone?.["study period start"]!);
-  const end = new Date(planner.milestone?.["exams end"]!);
+  const start = toSydneyZonedDateTime(planner.milestone?.["study period start"]!);
+  const end = toSydneyZonedDateTime(planner.milestone?.["exams end"]!);
 
   const periodOverlay: { color: string; start: number; end: number }[] = [];
-  let lastEndOverlay = 0;
-  for (const period of periods) {
-    if (!period) continue;
-    let color = "";
-    if (period === calendar.firstHalf || period === calendar.secondHalf) {
-      color = `bg-green-200/30`;
-    } else if (period === calendar.recess) {
-      color = `bg-amber-200/30`;
-    } else if (period === calendar.examPeriod) {
-      color = `bg-blue-200/30`;
-    }
-    const startOverlay = lastEndOverlay;
-    const endOverlay =
-      ((addDaysLocal(new Date(period.endDate!), -1).getTime() - start.getTime()) /
-        (end.getTime() - start.getTime())) *
-      100;
-    lastEndOverlay = endOverlay;
-    periodOverlay.push({
-      color,
-      start: startOverlay,
-      end: endOverlay,
-    });
-  }
-  if (periodOverlay.length) {
-    periodOverlay[periodOverlay.length - 1].end = 100;
-  }
-
   let todayPercent: number | null = null;
-  if (!Number.isNaN(start.getTime()) && !Number.isNaN(end.getTime()) && !Number.isNaN(today.getTime())) {
-    const raw = ((addTimes(today, { days: -1, hours: -12 }).getTime() - start.getTime()) / (end.getTime() - start.getTime())) * 100;
+
+  if (start && end) {
+    const spanMs = end.epochMilliseconds - start.epochMilliseconds;
+    let lastEndOverlay = 0;
+    for (const period of periods) {
+      if (!period) continue;
+      let color = "";
+      if (period === calendar.firstHalf || period === calendar.secondHalf) {
+        color = `bg-green-200/30`;
+      } else if (period === calendar.recess) {
+        color = `bg-amber-200/30`;
+      } else if (period === calendar.examPeriod) {
+        color = `bg-blue-200/30`;
+      }
+      const periodEnd = toSydneyPlainDate(period.endDate);
+      if (!periodEnd) continue;
+      const startOverlay = lastEndOverlay;
+      const endOverlay =
+        ((plainDateToZonedMidnight(addDaysLocal(periodEnd, -1)).epochMilliseconds - start.epochMilliseconds) /
+          spanMs) *
+        100;
+      lastEndOverlay = endOverlay;
+      periodOverlay.push({
+        color,
+        start: startOverlay,
+        end: endOverlay,
+      });
+    }
+    if (periodOverlay.length) {
+      periodOverlay[periodOverlay.length - 1].end = 100;
+    }
+
+    const adjustedToday = addTimes(today, { days: -1, hours: -12 }) as Temporal.ZonedDateTime;
+    const raw = ((adjustedToday.epochMilliseconds - start.epochMilliseconds) / spanMs) * 100;
     todayPercent = Math.max(0, Math.min(100, raw));
   }
 

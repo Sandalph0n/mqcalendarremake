@@ -1,10 +1,11 @@
 import React, { useState } from 'react'
 import { cn } from '@/lib/utils'
 import { SessionCalendarProps, usePlanner } from '@/contexts/PlannerContext'
-import { addDaysLocal, dateFromSydneyLocalTime, addTimes } from '@/lib/timeUtils';
+import { addDaysLocal, addTimes, plainDateToZonedMidnight, toSydneyPlainDate, toSydneyZonedDateTime, SYDNEY_TZ } from '@/lib/timeUtils';
+import { Temporal } from "temporal-polyfill";
 import { ExternalLink } from "lucide-react";
 
-const SUBJECT_PALETTE: Array<[number, number, number]> = [
+export const SUBJECT_PALETTE: Array<[number, number, number]> = [
 	[59, 130, 246],   // blue
 	[34, 197, 94],    // green
 	[245, 158, 11],   // amber
@@ -34,11 +35,11 @@ const SubjectCalendar = () => {
 	const weekEntries = Object.entries(weeks)
 		.map(([num, data]) => {
 			const n = Number(num);
-				if (Number.isNaN(n)) return null;
-				const label = data.weekLabelShort?.length ? data.weekLabelShort.join(" • ") : `Week ${n}`;
-				// console.log(data)
+			if (Number.isNaN(n)) return null;
+			const label = data.weekLabelShort?.length ? data.weekLabelShort.join(" • ") : `Week ${n}`;
+			// console.log(data)
 
-				return { number: n, label };
+			return { number: n, label };
 		})
 		.filter(Boolean)
 		.sort((a, b) => (a!.number - b!.number)) as { number: number; label: string }[];
@@ -49,7 +50,7 @@ const SubjectCalendar = () => {
 	const gridTemplateRows = `${headerHeight} repeat(${Math.max(subjects.length, 1)}, ${rowHeight})`;
 	const gridTemplateCols = `${subjectColWidth} ${weekEntries.map(() => "minmax(2rem,1fr)").join(" ") || "1fr"}`;
 	// Change this value to test a different current day if needed
-	const today = new Date()
+	const today = Temporal.Now.zonedDateTimeISO(SYDNEY_TZ);
 	const weightToBg = (weight: number, base: [number, number, number]) => {
 		if (!weight || weight <= 0) return undefined;
 		const capped = Math.min(weight, 60);
@@ -58,8 +59,8 @@ const SubjectCalendar = () => {
 	};
 
 	const periods = [calendar.firstHalf, calendar.recess, calendar.secondHalf, calendar.examPeriod];
-	const start = new Date(planner.milestone?.['study period start']!);
-	const end = new Date(planner.milestone?.['exams end']!);
+	const start = toSydneyZonedDateTime(planner.milestone?.['study period start']!);
+	const end = toSydneyZonedDateTime(planner.milestone?.['exams end']!);
 
 	const periodOverlay: {
 		color: string;
@@ -67,40 +68,45 @@ const SubjectCalendar = () => {
 		end: number;
 	}[] = [];
 
-	let lastEndOverlay = 0;
-	for (const period of periods) {
-		if (!period?.endDate) continue;
+	let todayPercent: number | null = null;
 
-		let color = "";
-		if (period === calendar.firstHalf || period === calendar.secondHalf) {
-			color = `bg-green-200/30`;
-		} else if (period === calendar.recess) {
-			color = `bg-yellow-200/30`;
-		} else if (period === calendar.examPeriod) {
-			color = `bg-blue-200/30`;
+	if (start && end) {
+		const spanMs = end.epochMilliseconds - start.epochMilliseconds;
+		let lastEndOverlay = 0;
+
+		for (const period of periods) {
+			const periodEnd = toSydneyPlainDate(period?.endDate);
+			if (!periodEnd) continue;
+
+			let color = "";
+			if (period === calendar.firstHalf || period === calendar.secondHalf) {
+				color = `bg-green-200/30`;
+			} else if (period === calendar.recess) {
+				color = `bg-yellow-200/30`;
+			} else if (period === calendar.examPeriod) {
+				color = `bg-blue-200/30`;
+			}
+
+			const startOverlay = lastEndOverlay;
+			const endOverLay =
+				(plainDateToZonedMidnight(addDaysLocal(periodEnd, -1)).epochMilliseconds - start.epochMilliseconds) /
+				spanMs *
+				100;
+			lastEndOverlay = endOverLay;
+
+			periodOverlay.push({
+				color,
+				start: startOverlay,
+				end: endOverLay,
+			});
 		}
 
-		const startOverlay = lastEndOverlay;
-		const endOverLay =
-			(addDaysLocal(new Date(period.endDate), -1).getTime() - start.getTime()) /
-			(end.getTime() - start.getTime()) *
-			100;
-		lastEndOverlay = endOverLay;
+		if (periodOverlay.length) {
+			periodOverlay[periodOverlay.length - 1].end = 100; // ensure the final overlay reaches the end
+		}
 
-		periodOverlay.push({
-			color,
-			start: startOverlay,
-			end: endOverLay,
-		});
-	}
-
-	if (periodOverlay.length) {
-		periodOverlay[periodOverlay.length - 1].end = 100; // ensure the final overlay reaches the end
-	}
-
-	let todayPercent: number | null = null;
-	if (!Number.isNaN(start.getTime()) && !Number.isNaN(end.getTime()) && !Number.isNaN(today.getTime())) {
-		const raw = ((addTimes(today, {days: -1, hours: -12}).getTime() - start.getTime()) / (end.getTime() - start.getTime())) * 100;
+		const adjustedToday = addTimes(today, { days: -1, hours: -12 }) as Temporal.ZonedDateTime;
+		const raw = ((adjustedToday.epochMilliseconds - start.epochMilliseconds) / spanMs) * 100;
 		todayPercent = Math.max(0, Math.min(100, raw));
 	}
 
@@ -155,14 +161,14 @@ const SubjectCalendar = () => {
 						))}
 						{todayPercent !== null && (
 							<div
-              className="absolute pointer-events-none"
-              style={{ left: `${subjectColWidth}`, right: 0, top: 0, bottom: 0 }}
-            >
-              <div
-                className="absolute top-0 bottom-0 w-[2px] bg-primary/70"
-                style={{ left: `${todayPercent}%` }}
-              />
-            </div>
+								className="absolute pointer-events-none"
+								style={{ left: `${subjectColWidth}`, right: 0, top: 0, bottom: 0 }}
+							>
+								<div
+									className="absolute top-0 bottom-0 w-[2px] bg-primary/70"
+									style={{ left: `${todayPercent}%` }}
+								/>
+							</div>
 						)}
 					</div>
 					{/* Top-left header (sticky) */}
@@ -211,12 +217,12 @@ const SubjectCalendar = () => {
 						weekEntries.map((w, colIdx) => (
 							<div
 								key={`cell-${rowIdx}-${w.number}`}
-								className="relative flex items-center justify-center text-xs text-muted-foreground bg-background/60 group"
-									style={{
-										gridRowStart: rowIdx + 2,
-										gridColumnStart: colIdx + 2,
-										backgroundColor: weightToBg(
-											cellMatrix[rowIdx]?.[colIdx]?.weight,
+								className="relative flex items-center justify-center text-xs text-muted-foreground bg-background/60 group" tabIndex={0}
+								style={{
+									gridRowStart: rowIdx + 2,
+									gridColumnStart: colIdx + 2,
+									backgroundColor: weightToBg(
+										cellMatrix[rowIdx]?.[colIdx]?.weight,
 										SUBJECT_PALETTE[rowIdx % SUBJECT_PALETTE.length]
 									),
 								}}
@@ -226,7 +232,7 @@ const SubjectCalendar = () => {
 									: "—"}
 								{cellMatrix[rowIdx]?.[colIdx]?.assignments.length ? (
 									<div
-										className="absolute z-50 hidden w-64 max-w-[16rem] -translate-x-1/2 -translate-y-2 whitespace-normal rounded-md border border-border bg-card p-3 text-foreground shadow-lg group-hover:block"
+										className="absolute z-50 hidden w-64 max-w-[16rem] -translate-x-1/2 -translate-y-2 whitespace-normal rounded-md border border-border bg-card p-3 text-foreground shadow-lg group-hover:block group-focus-within:block"
 										style={{ left: "50%", top: 0 }}
 									>
 										<div className="text-xs font-semibold mb-1">Assignments</div>

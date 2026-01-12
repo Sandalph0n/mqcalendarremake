@@ -3,6 +3,8 @@ import React ,{ createContext, useContext, useState, useEffect } from "react";
 import Settings from "@/config/AppSetting"
 import { PeriodMileStoneKey } from "@/lib/data/MacquarieCalendarEntry";
 import { TimePeriod } from "@/lib/timeUtils";
+import { Temporal } from "temporal-polyfill";
+
 
 export type MilestoneMap = Partial<Record<PeriodMileStoneKey, string>>;
 export type AssignmentProps = {
@@ -20,8 +22,8 @@ export type AssignmentProps = {
 export type SessionCalendarProps = {
 	week:{ 
 		[week: number  ]: { 
-			startDate?: Date
-			endDate?: Date
+			startDate?: Temporal.ZonedDateTime
+			endDate?: Temporal.ZonedDateTime
 			weekLabel?: string[]
 			weekLabelShort?: string[]
 			events?: Partial<Record<PeriodMileStoneKey, string>>
@@ -45,7 +47,7 @@ export type SubjectProps=  {
 	unitName?: string
 	unitGuideURL?: string
 	assignments?: AssignmentProps[]
-	
+	id: string
 }
 
 export type PlannerProps = {
