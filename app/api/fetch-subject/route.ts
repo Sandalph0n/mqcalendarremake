@@ -10,7 +10,7 @@ export async function fetchSubjectFromUnitGuide(
     subjectURL: string
 ): Promise<SubjectProps> {
     const { JSDOM } = await import("jsdom");
-    const result: SubjectProps = {};
+    const result: SubjectProps = {id: ""};
 
     const unitGuide = await fetch(subjectURL, { cache: "no-store" });
     if (!unitGuide.ok) {
