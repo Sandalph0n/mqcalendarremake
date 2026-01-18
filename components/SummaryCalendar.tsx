@@ -218,9 +218,9 @@ const SummaryCalendar = () => {
 																	style={
 																		day.color
 																			? {
-																					backgroundColor: `rgba(${day.color[0]}, ${day.color[1]}, ${day.color[2]}, 0.15)`,
-																					color: `rgb(${day.color[0]}, ${day.color[1]}, ${day.color[2]})`,
-																			  }
+																				backgroundColor: `rgba(${day.color[0]}, ${day.color[1]}, ${day.color[2]}, 0.15)`,
+																				color: `rgb(${day.color[0]}, ${day.color[1]}, ${day.color[2]})`,
+																			}
 																			: undefined
 																	}
 																>
@@ -228,7 +228,7 @@ const SummaryCalendar = () => {
 																	{day.eventLabel}
 																</span>
 																{day.color && (
-																	<div className="pointer-events-none absolute left-1/2 top-full z-50 hidden w-72 max-w-[18rem] -translate-x-1/2 translate-y-2 rounded-md border border-border bg-card p-3 text-foreground shadow-lg group-hover:block group-focus-within:block">
+																	<div className="absolute left-1/2 top-full z-50 hidden w-72 max-w-[18rem] -translate-x-1/2 translate-y-2 rounded-md border border-border bg-card p-3 text-foreground shadow-lg group-hover:block group-focus-within:block ">
 																		<div className="text-xs font-semibold mb-1">
 																			{day.subjectCode ? `${day.subjectCode}: ` : ""}
 																			{day.eventLabel}

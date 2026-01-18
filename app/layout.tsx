@@ -17,8 +17,8 @@ export const metadata: Metadata = {
   icons: {
     // icon: "/favicon.ico",
     // shortcut: "/favicon.ico",
-    icon: "https://www.mq.edu.au/?a=1232",
-    shortcut: "https://www.mq.edu.au/?a=1232",
+    icon: "favicon.ico",
+    shortcut: "favicon.ico",
   },
 };
 
