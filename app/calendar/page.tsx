@@ -45,7 +45,7 @@ const CalendarPage = () => {
 							<>
 								<Card className="border-border bg-card/90 shadow-sm">
 									<CardHeader className="space-y-1">
-										<CardTitle className="text-xl">Assignment Heatmap</CardTitle>
+										<CardTitle className="text-xl">Assessment Heatmap</CardTitle>
 										<CardDescription className="text-muted-foreground">
 											Switch between per-subject focus or semester-wide load.
 										</CardDescription>

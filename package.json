@@ -2,7 +2,7 @@
   "name": "mqcalendarremake",
   "version": "0.1.0",
   "private": true,
-  "description": "Assignment Planner Ppplication for Macquarie University students",
+  "description": "Assessment Planner Application for Macquarie University students",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

@@ -16,8 +16,8 @@ const quickSteps = [
 		body: "Enter the Unit Code (e.g. COMP1000) then Fetch. Subjects are stored locally; no login needed.",
 	},
 	{
-		title: "3) Review assignments",
-		body: "Open each subject to see parsed assignments. Tweak name, weight, week, or due date if the Unit Guide wording differs.",
+		title: "3) Review assessments",
+		body: "Open each subject to see parsed assessments. Tweak name, weight, week, or due date if the Unit Guide wording differs.",
 	},
 	{
 		title: "4) View the heatmap",
@@ -45,10 +45,10 @@ const deepDive = [
 		action: { label: "Set up study period", href: "/subject-planner#study-period" },
 	},
 	{
-		title: "Assignments",
+		title: "Assessments",
 		icon: ListChecks,
 		points: [
-			"Click a subject to expand and edit assignments.",
+			"Click a subject to expand and edit assessments.",
 			"Choose to enter by date (YYYY-MM-DD) or by week. Date mode auto-maps to a week using the term calendar.",
 			"Mark Hurdle / Exam / Weekly, update weight, and add an anchor to open the exact Unit Guide section.",
 		],
@@ -58,7 +58,7 @@ const deepDive = [
 		title: "Heatmap & overlay",
 		icon: LineChart,
 		points: [
-			"Subject planner tab: see weekly load per subject; hover for assignment details + Unit Guide link.",
+			"Subject planner tab: see weekly load per subject; hover for assessment details + Unit Guide link.",
 			"Semester planner tab: column color is based on total weight of all subjects that week.",
 			"Overlay shows teaching / recess / exam and a Today line so you know your position in the term.",
 		],
@@ -68,8 +68,8 @@ const deepDive = [
 
 const tips = [
 	"No data showing? Recheck year/session or Fetch the subject again (uppercase not required).",
-	"Week looks wrong after entering a date: ensure your timezone is Sydney/AU or pick Week directly in Assignment.",
-	"Total weight not 100%? Update each assignment in the Advanced section.",
+	"Week looks wrong after entering a date: ensure your timezone is Sydney/AU or pick Week directly in Assessment.",
+	"Total weight not 100%? Update each assessment in the Advanced section.",
 	"Want a clean slate? In Subject Planner, delete the subject then add it again.",
 ];
 
@@ -94,7 +94,7 @@ export default function UserManualPage() {
 						</div>
 						<CardTitle className="text-4xl font-bold tracking-tight">Plan your semester in minutes</CardTitle>
 						<CardDescription className="text-base text-foreground/80">
-							Step-by-step guide to set your study period, fetch subjects from the Unit Guide, tidy assignments, and read workload heatmaps.
+							Step-by-step guide to set your study period, fetch subjects from the Unit Guide, tidy assessments, and read workload heatmaps.
 						</CardDescription>
 						<div className="flex flex-wrap gap-3">
 							<Button asChild>
@@ -144,7 +144,7 @@ export default function UserManualPage() {
 										<div>
 											<CardTitle className="text-xl leading-tight">{block.title}</CardTitle>
 											<CardDescription className="text-sm text-muted-foreground">
-												{block.icon === ListChecks ? "Edit assignments" : "Set up and read the calendars"}
+												{block.icon === ListChecks ? "Edit assessments" : "Set up and read the calendars"}
 											</CardDescription>
 										</div>
 									</div>

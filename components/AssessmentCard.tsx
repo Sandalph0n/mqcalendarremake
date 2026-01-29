@@ -1,22 +1,22 @@
 'use client';
 
 import React, { useEffect, useMemo, useState } from "react";
-import { AssignmentProps, usePlanner } from "@/contexts/PlannerContext";
+import { AssessmentProps, usePlanner } from "@/contexts/PlannerContext";
 import { ExternalLink } from "lucide-react";
 import { Button } from "./ui/button";
 import { dateFromSydneyKey, isBetweenDates, toSydneyPlainDate, zonedMidnight } from "@/lib/timeUtils";
 
 
-type AssignmentCardProps = {
-	assignment: AssignmentProps;
+type AssessmentCardProps = {
+	assessment: AssessmentProps;
 	subjectIndex: number;
-	index: number; // assignment index
+	index: number; // assessment index
 	unitGuideURL?: string;
 };
 
-const AssignmentCard = ({ assignment, index, subjectIndex, unitGuideURL }: AssignmentCardProps) => {
+const AssessmentCard = ({ assessment, index, subjectIndex, unitGuideURL }: AssessmentCardProps) => {
 	const [showAdvanced, setShowAdvanced] = useState(false);
-	const [mode, setMode] = useState<"date" | "week">(assignment.dueDate ?  "date" : "week");
+	const [mode, setMode] = useState<"date" | "week">(assessment.dueDate ?  "date" : "week");
 	const { planner, setPlanner } = usePlanner();
 
 	const weekOptions = useMemo(() => {
@@ -31,7 +31,7 @@ const AssignmentCard = ({ assignment, index, subjectIndex, unitGuideURL }: Assig
 			.filter(Boolean) as Array<{ value: number; label: string }>;
 	}, [planner.calendar?.week]);
 
-	function updateAssignment(updates: Partial<AssignmentProps>) {
+	function updateAssessment(updates: Partial<AssessmentProps>) {
 		if (updates.dueDate){
 			
 			const auDate = dateFromSydneyKey(updates.dueDate)
@@ -53,11 +53,11 @@ const AssignmentCard = ({ assignment, index, subjectIndex, unitGuideURL }: Assig
 			const currentSubject = subjects[subjectIndex];
 			if (!currentSubject) return prev ?? { subjects: [] };
 
-			const nextAssignments = [...(currentSubject.assignments ?? [])];
-			const currentAsm = nextAssignments[index] ?? {};
-			nextAssignments[index] = { ...currentAsm, ...updates };
+			const nextAssessments = [...(currentSubject.assessments ?? [])];
+			const currentAsm = nextAssessments[index] ?? {};
+			nextAssessments[index] = { ...currentAsm, ...updates };
 
-			subjects[subjectIndex] = { ...currentSubject, assignments: nextAssignments };
+			subjects[subjectIndex] = { ...currentSubject, assessments: nextAssessments };
 			return { ...(prev ?? {}), subjects };
 		});
 
@@ -70,9 +70,9 @@ const AssignmentCard = ({ assignment, index, subjectIndex, unitGuideURL }: Assig
 		// Nhưng khi nhập vào date, thì không được xoá week
 		setMode(nextMode);
 		if (nextMode === "date") {
-			updateAssignment({ dueWeek: undefined, dueDate: assignment.dueDate ?? "" });
+			updateAssessment({ dueWeek: undefined, dueDate: assessment.dueDate ?? "" });
 		} else {
-			updateAssignment({ dueDate: undefined, dueWeek: assignment.dueWeek ?? undefined });
+			updateAssessment({ dueDate: undefined, dueWeek: assessment.dueWeek ?? undefined });
 		}
 	}
 
@@ -83,14 +83,14 @@ const AssignmentCard = ({ assignment, index, subjectIndex, unitGuideURL }: Assig
 			<div className="flex items-start justify-between gap-2">
 				<div className="space-y-1">
 					<p className="text-sm font-semibold leading-tight">
-						{assignment.name || `Assignment ${index + 1}`}
+						{assessment.name || `Assessment ${index + 1}`}
 					</p>
 					<p className="text-xs text-muted-foreground">
-						{assignment.dueText ? `Due date written in the Unit Guide: \"${assignment.dueText}\"` : "No due info"}
+						{assessment.dueText ? `Due date written in the Unit Guide: \"${assessment.dueText}\"` : "No due info"}
 					</p>
 				</div>
 				<span className="rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-semibold text-primary">
-					{assignment.weighting ?? 0}%
+					{assessment.weighting ?? 0}%
 				</span>
 			</div>
 			{/* To do task for student */}
@@ -128,8 +128,8 @@ const AssignmentCard = ({ assignment, index, subjectIndex, unitGuideURL }: Assig
 						<input
 							type="date"
 							className="w-full rounded-md border px-2 py-2 text-sm bg-background"
-							value={assignment.dueDate ?? ""}
-							onChange={(e) => updateAssignment({ dueDate: e.target.value || undefined })}
+							value={assessment.dueDate ?? ""}
+							onChange={(e) => updateAssessment({ dueDate: e.target.value || undefined })}
 						/>
 					</label>
 				) : (
@@ -137,10 +137,10 @@ const AssignmentCard = ({ assignment, index, subjectIndex, unitGuideURL }: Assig
 						Due week (choose from calendar)
 						<select
 							className="w-full rounded-md border px-2 py-2 text-sm bg-background"
-							value={assignment.dueWeek ?? ""}
+							value={assessment.dueWeek ?? ""}
 							onChange={(e) => {
 								const parsed = parseInt(e.target.value, 10);
-								updateAssignment({
+								updateAssessment({
 									dueWeek: Number.isNaN(parsed) ? undefined : parsed,
 									dueDate: undefined,
 								});
@@ -177,8 +177,8 @@ const AssignmentCard = ({ assignment, index, subjectIndex, unitGuideURL }: Assig
 							<input
 								type="text"
 								className="w-full rounded-md border px-2 py-2 text-sm bg-background"
-								value={assignment.name ?? ""}
-								onChange={(e) => updateAssignment({ name: e.target.value })}
+								value={assessment.name ?? ""}
+								onChange={(e) => updateAssessment({ name: e.target.value })}
 							/>
 						</label>
 						<label className="flex flex-col gap-1 text-xs font-semibold text-muted-foreground">
@@ -189,9 +189,9 @@ const AssignmentCard = ({ assignment, index, subjectIndex, unitGuideURL }: Assig
 								max={100}
 								step={0.5}
 								className="w-full rounded-md border px-2 py-2 text-sm bg-background"
-								value={assignment.weighting ?? 0}
+								value={assessment.weighting ?? 0}
 								onChange={(e) =>
-									updateAssignment({
+									updateAssessment({
 										weighting: parseFloat(e.target.value) || 0,
 									})
 								}
@@ -202,24 +202,24 @@ const AssignmentCard = ({ assignment, index, subjectIndex, unitGuideURL }: Assig
 						<label className="flex items-center gap-2">
 							<input
 								type="checkbox"
-								checked={Boolean(assignment.isHurdle)}
-								onChange={(e) => updateAssignment({ isHurdle: e.target.checked })}
+								checked={Boolean(assessment.isHurdle)}
+								onChange={(e) => updateAssessment({ isHurdle: e.target.checked })}
 							/>
 							Hurdle
 						</label>
 						<label className="flex items-center gap-2">
 							<input
 								type="checkbox"
-								checked={Boolean(assignment.isExam)}
-								onChange={(e) => updateAssignment({ isExam: e.target.checked })}
+								checked={Boolean(assessment.isExam)}
+								onChange={(e) => updateAssessment({ isExam: e.target.checked })}
 							/>
 							Exam
 						</label>
 						<label className="flex items-center gap-2">
 							<input
 								type="checkbox"
-								checked={Boolean(assignment.isWeekly)}
-								onChange={(e) => updateAssignment({ isWeekly: e.target.checked })}
+								checked={Boolean(assessment.isWeekly)}
+								onChange={(e) => updateAssessment({ isWeekly: e.target.checked })}
 							/>
 							Weekly
 						</label>
@@ -229,17 +229,17 @@ const AssignmentCard = ({ assignment, index, subjectIndex, unitGuideURL }: Assig
 						<input
 							type="text"
 							className="w-full rounded-md border px-2 py-2 text-sm bg-background"
-							value={assignment.anchor ?? ""}
-							onChange={(e) => updateAssignment({ anchor: e.target.value })}
+							value={assessment.anchor ?? ""}
+							onChange={(e) => updateAssessment({ anchor: e.target.value })}
 						/>
 					</label>
 				</div>
 			</div>
 
-			{assignment.anchor && unitGuideURL && (
+			{assessment.anchor && unitGuideURL && (
 				<a
 					className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-primary underline-offset-4 hover:underline"
-					href={`${unitGuideURL}#${assignment.anchor}`}
+					href={`${unitGuideURL}#${assessment.anchor}`}
 					target="_blank"
 					rel="noreferrer"
 				>
@@ -250,4 +250,4 @@ const AssignmentCard = ({ assignment, index, subjectIndex, unitGuideURL }: Assig
 	);
 };
 
-export default AssignmentCard;
+export default AssessmentCard;

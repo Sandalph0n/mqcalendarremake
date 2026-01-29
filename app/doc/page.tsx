@@ -21,7 +21,7 @@ const subjectSampleResponse = `{
     "session": 2,
     "year": 2025,
     "unitGuideURL": "https://unitguides.mq.edu.au/unit_offerings/173184/unit_guide",
-    "assignments": [
+    "assessments": [
       {
         "name": "Programming Skills Demonstration",
         "weighting": 30,
@@ -59,7 +59,7 @@ const endpoints: Endpoint[] = [
 		method: "POST",
 		path: "/api/find-subject",
 		description:
-			"Searches the public Unit Guide site by year, session, and unitCode, then returns a normalized subject with assignments.",
+			"Searches the public Unit Guide site by year, session, and unitCode, then returns a normalized subject with assessments.",
 		payload: `{
   "year": 2025,
   "session": 2,
@@ -68,7 +68,7 @@ const endpoints: Endpoint[] = [
 		response: subjectSampleResponse,
 		notes: [
 			"Returns 404 if the Unit Guide search does not find a matching year/session/unitCode.",
-			"Assignments may need manual week/date mapping after parsing.",
+			"Assessments may need manual week/date mapping after parsing.",
 		],
 	},
 	{
@@ -76,7 +76,7 @@ const endpoints: Endpoint[] = [
 		method: "POST",
 		path: "/api/fetch-subject",
 		description:
-			"Skips search and parses a specific Unit Guide page into a subject payload with assignments.",
+			"Skips search and parses a specific Unit Guide page into a subject payload with assessments.",
 		payload: `{
   "subjectURL": "https://unitguides.mq.edu.au/unit_offerings/173184/unit_guide"
 }`,
@@ -150,7 +150,7 @@ export default function ApiDocsPage() {
 						</div>
 						<CardTitle className="text-4xl font-bold tracking-tight">Integrate your planner data</CardTitle>
 						<CardDescription className="text-base text-foreground/80">
-							Use these public endpoints to fetch Unit Guide data, normalize assignments, and load Macquarie session milestones.
+							Use these public endpoints to fetch Unit Guide data, normalize assessments, and load Macquarie session milestones.
 						</CardDescription>
 						<div className="flex flex-wrap gap-3">
 							<Button asChild>
@@ -170,7 +170,7 @@ export default function ApiDocsPage() {
 					</CardHeader>
 					<CardContent className="grid gap-3 md:grid-cols-3">
 						<div className="rounded-lg border border-dashed border-border/80 bg-muted/40 p-3 text-sm text-foreground/80">
-							Base URL: <span className="font-mono">https://assignmentplanner.vercel.app/</span>
+							Base URL: <span className="font-mono">https://assessmentplanner.vercel.app/</span>
 						</div>
 						<div className="rounded-lg border border-dashed border-border/80 bg-muted/40 p-3 text-sm text-foreground/80">
 							Auth: not required. Be polite with frequency; endpoints call the public Unit Guide site.
@@ -190,7 +190,7 @@ export default function ApiDocsPage() {
 						<CodeBlock
 							label="Example"
 							code={`async function fetchSubject() {
-  const res = await fetch("https://assignmentplanner.vercel.app/api/find-subject", {
+  const res = await fetch("https://assessmentplanner.vercel.app/api/find-subject", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({

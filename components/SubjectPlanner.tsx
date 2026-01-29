@@ -93,7 +93,7 @@ const SubjectPlanner = () => {
 					</div>
 					<div>
 						<CardTitle className="text-xl">Subject Planner</CardTitle>
-						<CardDescription>Fetch and manage your unit assignments.</CardDescription>
+						<CardDescription>Fetch and manage your unit assessments.</CardDescription>
 					</div>
 				</div>
 			</CardHeader>
@@ -103,6 +103,8 @@ const SubjectPlanner = () => {
 						type="text"
 						placeholder="Enter Unit Code, e.g. COMP1000"
 						className="w-full rounded-md border px-3 py-2 bg-white/80 dark:bg-secondary/80 dark:text-white/80"
+						
+						// className="w-full rounded-md border px-3 py-2 bg-secondary-foreground/80 dark:text-white/80"
 						value={unitCodeInput}
 						onChange={handleChangeUnit}
 						onKeyDown={(e) => {

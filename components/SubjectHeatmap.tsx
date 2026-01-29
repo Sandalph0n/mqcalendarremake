@@ -18,7 +18,7 @@ export const SUBJECT_PALETTE: Array<[number, number, number]> = [
 
 type CellData = {
 	weight: number;
-	assignments: {
+	assessments: {
 		name?: string;
 		weighting?: number;
 		dueText?: string;
@@ -112,16 +112,16 @@ const SubjectCalendar = () => {
 
 	// Build cell data matrix subjects x weeks
 	const cellMatrix: CellData[][] = subjects.map(() =>
-		weekEntries.map(() => ({ weight: 0, assignments: [] }))
+		weekEntries.map(() => ({ weight: 0, assessments: [] }))
 	);
 
 	subjects.forEach((subject, sIdx) => {
-		for (const asm of subject.assignments ?? []) {
+		for (const asm of subject.assessments ?? []) {
 			if (!asm.dueWeek) continue;
 			const colIdx = weekEntries.findIndex((w) => w.number === asm.dueWeek);
 			if (colIdx < 0) continue;
 			cellMatrix[sIdx][colIdx].weight += asm.weighting ?? 0;
-			cellMatrix[sIdx][colIdx].assignments.push({
+			cellMatrix[sIdx][colIdx].assessments.push({
 				name: asm.name,
 				weighting: asm.weighting,
 				dueText: asm.dueText,
@@ -231,14 +231,14 @@ const SubjectCalendar = () => {
 								{cellMatrix[rowIdx]?.[colIdx]?.weight
 									? cellMatrix[rowIdx][colIdx].weight.toFixed(1)
 									: "—"}
-								{cellMatrix[rowIdx]?.[colIdx]?.assignments.length ? (
+								{cellMatrix[rowIdx]?.[colIdx]?.assessments.length ? (
 									<div
 										className="absolute z-50 hidden w-64 max-w-[16rem] -translate-x-1/2 -translate-y-2 whitespace-normal rounded-md border border-border bg-card p-3 text-foreground shadow-lg group-hover:block group-focus-within:block"
 										style={{ left: "50%", top: 0 }}
 									>
-										<div className="text-xs font-semibold mb-1">Assignments</div>
+										<div className="text-xs font-semibold mb-1">Assessments</div>
 										<div className="space-y-2">
-											{cellMatrix[rowIdx][colIdx].assignments.map((asm, idx) => (
+											{cellMatrix[rowIdx][colIdx].assessments.map((asm, idx) => (
 												<div key={`${rowIdx}-${colIdx}-${idx}`} className="text-xs">
 													<div className="font-semibold">{asm.name || "Untitled"}</div>
 													<div className="text-muted-foreground">

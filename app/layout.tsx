@@ -12,8 +12,8 @@ const inter = Inter({subsets:["latin"]})
 
 
 export const metadata: Metadata = {
-  title: "MQ Assignment Planner",
-  description: "Manage, Visualize and Genarate Assignment Calendar for Macquarie University Students",
+  title: "MQ Assessment Planner",
+  description: "Manage, Visualize and Genarate Assessment Calendar for Macquarie University Students",
   icons: {
     // icon: "/favicon.ico",
     // shortcut: "/favicon.ico",

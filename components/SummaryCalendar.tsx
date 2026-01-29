@@ -93,10 +93,10 @@ const SummaryCalendar = () => {
 			});
 		}
 
-		// Add assignments
+		// Add assessments
 		subjects.forEach((subject, sIdx) => {
 			const color = SUBJECT_PALETTE[sIdx % SUBJECT_PALETTE.length];
-			for (const asm of subject.assignments ?? []) {
+			for (const asm of subject.assessments ?? []) {
 				const weekNum =
 					asm.dueWeek ??
 					(() => {
@@ -121,7 +121,7 @@ const SummaryCalendar = () => {
 				const dueDate = asm.dueDate ? toSydneyZonedDateTime(asm.dueDate) : undefined;
 				target.rows.push({
 					date: dueDate!,
-					eventLabel: asm.name || "Assignment",
+					eventLabel: asm.name || "Assessment",
 					subjectCode: subject.unitCode,
 					color,
 					weighting: asm.weighting,
@@ -134,7 +134,7 @@ const SummaryCalendar = () => {
 			}
 		});
 
-		// Ensure consistent ordering within week: milestones (by date) then assignments
+		// Ensure consistent ordering within week: milestones (by date) then assessments
 		result.forEach((week) => {
 			week.rows.sort((a, b) => {
 				if (!a.date && !b.date) return 0;
@@ -156,7 +156,7 @@ const SummaryCalendar = () => {
 			<CardHeader className="relative flex flex-col gap-2">
 				<CardTitle className="text-xl">Summary Calendar</CardTitle>
 				<CardDescription className="text-muted-foreground">
-					A calendar summarizing important deadlines, along with assignment submission schedules, helps you manage your time better.
+					A calendar summarizing important deadlines, along with assessment submission schedules, helps you manage your time better.
 				</CardDescription>
 			</CardHeader>
 			<CardContent className="relative space-y-4">

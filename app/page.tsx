@@ -10,7 +10,7 @@ import ScrollButton from "@/components/ScrollButton";
 export default function Home() {
   const features = [
     {
-      title: "Plan and manage your assignments",
+      title: "Plan and manage your assessments",
       description: "Collect unit guides, capture every task, and keep everything organised in one place.",
       cta: "Start planning",
       href: "/subject-planner",
@@ -56,9 +56,9 @@ export default function Home() {
         <div className="absolute inset-0 opacity-80 hero-image" />
         {/* Element div */}
         <div className="relative z-10 mx-auto text-center text-white">
-          <h1 className="text-4xl font-extrabold sm:text-5xl lg:text-6xl">Assignment Planner</h1>
+          <h1 className="text-4xl font-extrabold sm:text-5xl lg:text-6xl">Assessment Planner</h1>
           <p className="mt-4 text-lg sm:text-xl text-gray-100/90 max-w-2xl mx-auto">
-            Manage, Visualize and Genarate Assignment Calendar for Macquarie University Students
+            Manage, Visualize and Genarate Assessment Calendar for Macquarie University Students
           </p>
         <ScrollButton 
           targetId="roadmap"
@@ -79,7 +79,7 @@ export default function Home() {
             <p className="text-sm font-semibold uppercase tracking-wide text-primary">Roadmap</p>
             <h2 className="text-3xl font-bold mt-2">From planning to integration</h2>
             <p className="mt-3 text-muted-foreground max-w-2xl mx-auto">
-              Follow the steps below to manage assignments, build a calendar, work offline, and extend with APIs.
+              Follow the steps below to manage assessments, build a calendar, work offline, and extend with APIs.
             </p> 
           </div>
           <div className="relative mt-12">

@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { SubjectProps, usePlanner } from "@/contexts/PlannerContext";
 import { MoreHorizontal, ExternalLink, ClipboardList, X, ClipboardCheck } from "lucide-react";
 import { Button } from "./ui/button";
-import AssignmentCard from "./AssignmentCard";
+import AssessmentCard from "./AssessmentCard";
 import {
 	DropdownMenu,
 	DropdownMenuItem,
@@ -32,9 +32,9 @@ type Props = {
 };
 
 const SubjectCard = ({ subject, index }: Props) => {
-	const assignments = subject.assignments ?? [];
+	const assessments = subject.assessments ?? [];
 	const [isEditing, setIsEditing] = useState(() => {
-		for (const asm of assignments) {
+		for (const asm of assessments) {
 			if (!asm.dueWeek && !asm.dueDate) {
 				return true;
 			}
@@ -42,7 +42,7 @@ const SubjectCard = ({ subject, index }: Props) => {
 		return false;
 	});
 	let notFinishedAsm = 0
-	for (const asm of assignments) {
+	for (const asm of assessments) {
 		if (!asm.dueWeek && !asm.dueDate) {
 			notFinishedAsm++;
 		}
@@ -62,17 +62,17 @@ const SubjectCard = ({ subject, index }: Props) => {
 						<div className="rounded-xl bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
 							{code}
 						</div>
-						{assignments.length > 0 && (
+						{assessments.length > 0 && (
 							<span className="flex items-center gap-1 rounded-md bg-accent/60 px-2 py-1 text-[11px] font-medium text-accent-foreground">
 								<ClipboardList className="size-3.5" />
-								{assignments.length} assignment
-								{assignments.length > 1 ? "s" : ""}
+								{assessments.length} assessment
+								{assessments.length > 1 ? "s" : ""}
 							</span>
 						)}
 						{notFinishedAsm > 0 && (
 							<span className="flex items-center gap-1 rounded-md bg-destructive/60 px-2 py-1 text-[11px] font-medium text-accent-foreground">
 								<ClipboardList className="size-3.5" />
-								{notFinishedAsm} assignment
+								{notFinishedAsm} assessment
 								{notFinishedAsm > 1 ? "s" : ""} not finished
 							</span>
 						)}
@@ -182,17 +182,17 @@ const SubjectCard = ({ subject, index }: Props) => {
 									<div className="rounded-xl bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
 										{code}
 									</div>
-									{assignments.length > 0 && (
+									{assessments.length > 0 && (
 										<span className="flex items-center gap-1 rounded-md bg-accent/60 px-2 py-1 text-[11px] font-medium text-accent-foreground">
 											<ClipboardList className="size-3.5" />
-											{assignments.length} assignment
-											{assignments.length > 1 ? "s" : ""}
+											{assessments.length} assessment
+											{assessments.length > 1 ? "s" : ""}
 										</span>
 									)}
 									{notFinishedAsm > 0 && (
 										<span className="flex items-center gap-1 rounded-md bg-destructive/60 px-2 py-1 text-[11px] font-medium text-accent-foreground">
 											<ClipboardList className="size-3.5" />
-											{notFinishedAsm} assignment
+											{notFinishedAsm} assessment
 											{notFinishedAsm > 1 ? "s" : ""} not finished
 										</span>
 									)}
@@ -237,14 +237,14 @@ const SubjectCard = ({ subject, index }: Props) => {
 						</div>
 
 						<CardContent className="overflow-y-auto ">
-							{assignments.length === 0 ? (
-								<p className="text-sm text-muted-foreground">No assignments parsed.</p>
+							{assessments.length === 0 ? (
+								<p className="text-sm text-muted-foreground">No assessments parsed.</p>
 							) : (
 								<div className="space-y-3  ">
-									{assignments.map((asm, aIdx) => (
-										<AssignmentCard
+									{assessments.map((asm, aIdx) => (
+										<AssessmentCard
 											key={`${asm.anchor || asm.name || aIdx}-${aIdx}`}
-											assignment={asm}
+											assessment={asm}
 											subjectIndex={index}
 											index={aIdx}
 											unitGuideURL={subject.unitGuideURL}

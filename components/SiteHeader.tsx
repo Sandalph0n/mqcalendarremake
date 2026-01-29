@@ -63,7 +63,7 @@ const SiteHeader = () => {
 								className='w-auto h-15 my-3'
 								loading='eager'
 							/>
-							{/* <span className='text-xl font-bold'>AssignmentPlanner</span> */}
+							{/* <span className='text-xl font-bold'>AssessmentPlanner</span> */}
 						</div>
 					</Link>
 				</div>
@@ -91,7 +91,7 @@ const SiteHeader = () => {
 						<Card className='w-80 rounded-none sm:ring-1 sm:ring-gray-900/20'>
 							<CardHeader>
 								<div>
-									<CardTitle>Assignment planner</CardTitle>
+									<CardTitle>Assessment planner</CardTitle>
 									<CardDescription>
 										Planner for student by student
 									</CardDescription>
