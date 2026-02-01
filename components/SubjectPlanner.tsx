@@ -49,8 +49,12 @@ const SubjectPlanner = () => {
 			});
 
 			if (!res.ok) {
-
-				throw new Error(`Request failed ${res.status}`);
+				if (res.status == 404){
+					throw new Error(`Cannot find subject ${unitCodeInput} for period ${planner.year} session ${planner.session}. Please check unit guide and try again.`);
+				}
+				else{
+					throw new Error(`Internal server error. Please check the server`);
+				}
 			}
 
 			const data = await res.json() as { subject: SubjectProps };

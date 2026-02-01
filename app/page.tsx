@@ -1,49 +1,37 @@
 import Image from "next/image";
+import Link from "next/link";
 import "./page.css";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { CalendarRange, CloudDownload, GitBranch, LayoutList } from "lucide-react";
-import Link from "next/link";
-import ScrollButton from "@/components/ScrollButton";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Globe2, ShieldCheck, Users } from "lucide-react";
 
+const highlights = [
+  {
+    title: "Independent, student-led",
+    description: "Created by students for students. No affiliation or endorsement by Macquarie University.",
+    icon: Users,
+  },
+  {
+    title: "Your data stays local",
+    description: "The planner never touches internal systems or private records—everything remains on your device.",
+    icon: ShieldCheck,
+  },
+  {
+    title: "Public Unit Guides only",
+    description: "Information is sourced from the public Unit Guide site so you stay aligned with official outlines.",
+    icon: Globe2,
+  },
+];
 
 export default function Home() {
-  const features = [
-    {
-      title: "Plan and manage your assessments",
-      description: "Collect unit guides, capture every task, and keep everything organised in one place.",
-      cta: "Start planning",
-      href: "/subject-planner",
-      icon: LayoutList,
-    },
-    {
-      title: "Visualize your plan",
-      description: "Generate a heatmap calendar so you know exactly when the workload spikes.",
-      cta: "See calendar",
-      href: "/calendar",
-      icon: CalendarRange,
-    },
-    {
-      title: "Offload your plan",
-      description: "Save to your device and reload offline after the first visit—no retyping required.",
-      cta: "Enable offline",
-      href: "/offload",
-      icon: CloudDownload,
-    },
-    {
-      title: "Integrate in your app",
-      description: "Use the public API to pull calendar data into your own tools or dashboards.",
-      cta: "View docs",
-      href: "/doc",
-      icon: GitBranch,
-    },
-  ];
-
   return (
     <div className="flex flex-col min-h-screen">
-      {/* Hero Section */}
-      <section id="hero" className="relative w-full min-h-[90vh] flex items-center bg-gray-300 overflow-hidden" aria-label="Homepage hero">
-        {/* Background image element so we can apply filters */}
+      {/* Single Hero Section (includes "How it works" content) */}
+      <section
+        id="hero"
+        className="relative w-full min-h-screen flex items-center bg-gray-300 overflow-hidden"
+        aria-label="Homepage hero"
+      >
         <Image
           src="/backgrounds/hero-image.png"
           alt=""
@@ -51,136 +39,69 @@ export default function Home() {
           className="absolute inset-0 h-full w-full object-cover grayscale-50 filter blur-sm"
           fill
           loading="eager"
+          priority
         />
-        {/* red-pink cover */}
         <div className="absolute inset-0 opacity-80 hero-image" />
-        {/* Element div */}
-        <div className="relative z-10 mx-auto text-center text-white">
-          <h1 className="text-4xl font-extrabold sm:text-5xl lg:text-6xl">Assessment Planner</h1>
-          <p className="mt-4 text-lg sm:text-xl text-gray-100/90 max-w-2xl mx-auto">
-            Manage, Visualize and Genarate Assessment Calendar for Macquarie University Students
-          </p>
-        <ScrollButton 
-          targetId="roadmap"
-          className="mt-6 inline-flex hover:cursor-pointer items-center justify-center px-6 py-3  font-semibold text-primary-foreground  shadow-md hover:shadow-lg transition-all"
-          variant="secondary"
-        >
-          Getting started
-        </ScrollButton>
 
-        </div>
-
-      </section>
-
-      {/* Feature Section */}
-      <section id="roadmap" className="py-16 bg-background min-h-lvh items-center flex">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="text-center">
-            <p className="text-sm font-semibold uppercase tracking-wide text-primary">Roadmap</p>
-            <h2 className="text-3xl font-bold mt-2">From planning to integration</h2>
-            <p className="mt-3 text-muted-foreground max-w-2xl mx-auto">
-              Follow the steps below to manage assessments, build a calendar, work offline, and extend with APIs.
-            </p> 
-          </div>
-          <div className="relative mt-12">
-            {/* Connecting line behind roadmap cards (desktop only):
-                - hidden md:block: only render from md breakpoint to avoid clutter on mobile
-                - absolute + z-0: positioned relative to this container and sits beneath the cards
-                - top-1/2: vertically centers the line relative to card stack
-                - left/right 6%: insets so circles/edges don't hit the viewport edge
-                - pointer-events-none: prevent blocking hover/click on cards */}
-            <div
-              className="hidden md:block absolute top-1/2 left-[6%] right-[6%] h-1 bg-primary/20 rounded-full pointer-events-none z-0"
-              aria-hidden
-            />
-            {/* Cards sit above the line (z-10) and use a responsive grid: single column on mobile, 4 cols on md+ */}
-            <div className="relative z-10 grid grid-cols-1 md:grid-cols-4 gap-6">
-              {features.map((feature, idx) => {
-                const Icon = feature.icon;
-                return (
-                  <div key={feature.title} className="relative">
-                    <div className="hidden md:flex absolute -top-5 left-1/2 -translate-x-1/2 w-10 h-10 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg">
-                      {idx + 1}
-                    </div>
-                    <Card className="h-full">
-                      <CardHeader className="pb-2">
-                        <div className="flex items-center gap-3">
-                          <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
-                            <Icon className="size-5 min-w-3xl" aria-hidden />
-                          </span>
-                          <CardTitle className="text-lg leading-tight">{feature.title}</CardTitle>
-                        </div>
-                      </CardHeader>
-                      <CardContent className="flex flex-col gap-4 pt-0 h-full">
-                        <CardDescription className="flex-1 text-sm">{feature.description}</CardDescription>
-                          <Button
-                            asChild
-                            variant="secondary" className="w-full"
-                          >
-                            <Link
-                              href = {feature.href}
-                            >
-                              {feature.cta}
-                            </Link>
-                          </Button>
-                      </CardContent>
-                    </Card>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* How it works */}
-      <section id="how-it-works" className="py-16 bg-secondary text-secondary-foreground min-h-lvh flex items-center">
-        <div className="max-w-6xl mx-auto px-6 space-y-8">
-          <div className="max-w-3xl space-y-2 text-center mx-auto">
-            <p className="text-sm font-semibold uppercase tracking-wide text-primary">How this app works</p>
-            <h2 className="text-3xl font-bold">Built by students, powered by your unit guides</h2>
-            <p className="text-secondary-foreground/90">
-              This tool is a student-made planner. It is not an official Macquarie University product, and it never connects to your
-              internal accounts or private data. Everything stays on your device.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card className="h-full">
-              <CardHeader>
-                <CardTitle>Independent, student-led</CardTitle>
-              </CardHeader>
-              <CardContent className="text-muted-foreground">
-                Created by students to help peers organise assessments. No affiliation or endorsement by the University.
-              </CardContent>
-            </Card>
-
-            <Card className="h-full">
-              <CardHeader>
-                <CardTitle>Your data stays local</CardTitle>
-              </CardHeader>
-              <CardContent className="text-muted-foreground">
-                The planner does not access internal systems or personal records. Plans are stored on your device (and can be saved
-                offline later).
-              </CardContent>
-            </Card>
-
-            <Card className="h-full">
-              <CardHeader>
-                <CardTitle>Public Unit Guides only</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2 text-muted-foreground">
-                <p>
-                  We fetch information from the public Unit Guide site&mdash;the official place where each unit publishes its
-                  outline, assessments, weightings, and schedule.
-                </p>
-                <Button asChild variant="link" className="p-0 h-auto font-semibold">
+        <div className="relative z-10 w-full">
+          <div className="max-w-6xl mx-auto px-6 py-16 grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-10 items-center text-white">
+            <div className="space-y-5 text-left">
+              <span className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-4 py-2 text-sm font-medium backdrop-blur">
+                Student-built, for Macquarie University assessments
+              </span>
+              <h1 className="text-4xl font-extrabold sm:text-5xl lg:text-6xl leading-tight">
+                Plan every assessment. Keep it local. Start fast.
+              </h1>
+              <p className="text-lg sm:text-xl text-gray-100/90 max-w-2xl">
+                Collect unit guides, map every task, and visualise your workload—without handing data to anyone else.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Button
+                  asChild
+                  size="lg"
+                  className="px-7 py-6 text-base font-semibold shadow-lg hover:shadow-xl"
+                >
+                  <Link href="/subject-planner">Getting started</Link>
+                </Button>
+                <Button
+                  asChild
+                  variant="secondary"
+                  size="lg"
+                  className="px-7 py-6 text-base font-semibold bg-white/15 border-white/30 text-white hover:bg-white/25"
+                >
                   <Link href="https://unitguides.mq.edu.au/" target="_blank" rel="noreferrer">
-                    Visit the Unit Guide site
+                    View Unit Guides
                   </Link>
                 </Button>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <p className="text-sm uppercase tracking-wide text-white/80 font-semibold">
+                How this app keeps you in control
+              </p>
+              <div className="grid grid-cols-1 gap-3">
+                {highlights.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <Card
+                      key={item.title}
+                      className="h-full bg-white/10 backdrop-blur border-white/20 text-white shadow-lg"
+                    >
+                      <CardHeader className="flex flex-row items-start gap-3 pb-2">
+                        <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white/15">
+                          <Icon className="size-5" aria-hidden />
+                        </span>
+                        <CardTitle className="leading-tight">{item.title}</CardTitle>
+                      </CardHeader>
+                      <CardContent className="pt-0 text-white/80 text-sm">
+                        {item.description}
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+            </div>
           </div>
         </div>
       </section>

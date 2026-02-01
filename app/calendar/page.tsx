@@ -52,9 +52,9 @@ const CalendarPage = () => {
 									</CardHeader>
 									<CardContent className="p-4">
 										<Tabs defaultValue="subject" className="w-full">
-											<TabsList className="mb-4">
-												<TabsTrigger value="subject">Subject planner</TabsTrigger>
-												<TabsTrigger value="semester">Semester planner</TabsTrigger>
+											<TabsList className="mb-4 bg-primary ">
+												<TabsTrigger className="border-none text-primary-foreground data-[state=active]:text-foreground" value="subject">Subject planner</TabsTrigger>
+												<TabsTrigger className="border-none text-primary-foreground data-[state=active]:text-foreground" value="semester">Semester planner</TabsTrigger>
 											</TabsList>
 											<TabsContent value="subject" className="space-y-4">
 												<SubjectCalendar/>
@@ -66,7 +66,7 @@ const CalendarPage = () => {
 										</Tabs>
 									</CardContent>
 									<CardFooter>
-										<CardDescription className="text-destructive/40 ">
+										<CardDescription className="text-destructive ">
 											This calendar mirrors your settings from the <Link href="/subject-planner" className="underline underline-offset-2">Subject Planner</Link>. If anything looks off, adjust it there and refresh here.
 										</CardDescription>
 									</CardFooter>
