@@ -7,24 +7,73 @@ import LightLogo from "../public/logo-light.png";
 import DarkLogo from "../public/logo-dark.png";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
-
-import { Menu, X } from 'lucide-react';
+import { Menu, Route, X } from 'lucide-react';
 import { Button } from './ui/button';
+import { FileBracesCorner } from "lucide-react"
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { ModeToggle } from './ModeToggle';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardAction, CardFooter } from './ui/card';
 
+import {
+	NavigationMenu,
+	NavigationMenuContent,
+	NavigationMenuItem,
+	NavigationMenuLink,
+	NavigationMenuList,
+	NavigationMenuTrigger,
+	navigationMenuTriggerStyle,
+	CustomNavigationMenuTrigger,
+	customNavigationMenuTriggerStyle,
+	CustomNavigationMenuLink
+
+} from "@/components/ui/navigation-menu"
 
 
+interface INavigation {
+	name: string,
+	description?: string,
+	href: string,
+	childen?: INavigation[]
+}
 
-const navigation = [
+const navigation: INavigation[] = [
+	{
+		name: "Home", href: "/",
+		childen: [
+			{
+				name: "How To Use",
+				href: "/user-manual",
+				description: "Quick 6-step guide to set the term, add units, view the heatmap, and save locally.",
+			},
+			{
+				name: "Document",
+				href: "/doc",
+				description: "Detailed docs on milestones, editing assessments, and common fixes.",
+			},
+			{
+				name: "About",
+				href: "/about",
+				description: "Meet the student team, core values, and how the app keeps your data transparent.",
+			},
+		]
+	},
+
+	{ name: "Subject Planner", href: "/subject-planner" },
+	{ name: "Calendar", href: "/calendar" },
+
+]
+
+
+const MobileNavigation = [
 	{ name: "Home", href: "/" },
 	{ name: "How To Use", href: "/user-manual" },
 	{ name: "Subject Planner", href: "/subject-planner" },
 	{ name: "Calendar", href: "/calendar" },
 	{ name: "About", href: "/about" },
 	{ name: "Document", href: "/doc" },
+	{ name: "Data Manager", href: "/data-manager"}
+
 ]
 {/* <img 
 	src="https://cap-theme-prod-ap-southeast-2.s3.ap-southeast-2.amazonaws.com/mq/MQ_Int_HoriztonalLogo.svg" 
@@ -112,7 +161,7 @@ const SiteHeader = () => {
 								<div
 									className='flow-root'
 								>
-									{navigation.map((item) => (
+									{MobileNavigation.map((item) => (
 										<Link
 											key={item.name}
 											href={item.href}
@@ -127,17 +176,26 @@ const SiteHeader = () => {
 											{item.name}
 										</Link>
 									))}
+
 								</div>
 
-							<hr className='mt-2'/>
+								<hr className='mt-2' />
 							</CardContent>
-							<CardFooter className='flex justify-between'>
-								<div>
-									<p>Toggle theme</p>
+							<CardFooter className='flex justify-between gap-2.5 flex-col'>
+								<div className='flex items-center justify-between gap-2.5 w-full'>
+									<div>
+										<p>Toggle theme</p>
+									</div>
+									<div>
+										<ModeToggle />
+									</div>
+
 								</div>
-								<div>
-									<ModeToggle />
-								</div>
+
+
+								
+
+
 							</CardFooter>
 						</Card>
 					</div>
@@ -147,26 +205,116 @@ const SiteHeader = () => {
 
 				{/* Navigation div, show when large */}
 				<div className='hidden lg:flex gap-x-8'>
-					{navigation.map((item) => (
-						<Link
-							key={item.href}
-							href={item.href}
-							className={cn(
-								"text-md font-semibold leading-6 transition-colors hover:text-primary",
-								pathName === item.href ? "text-primary" : "text-foreground"
-							)}
-						>
-							{item.name}
-						</Link>
-					))}
+					<NavigationMenu>
+						<NavigationMenuList>
+							{navigation.map((item) => {
+								// <Link
+								// 	key={item.href}
+								// 	href={item.href}
+								// 	className={cn(
+								// 		"text-md font-semibold leading-6 transition-colors hover:text-primary",
+								// 		pathName === item.href ? "text-primary" : "text-foreground"
+								// 	)}
+								// >
+								// 	{item.name}
+								// </Link>
+
+								if (!item.childen) { // no children
+									return (
+										<NavigationMenuItem>
+											<CustomNavigationMenuLink
+												asChild
+												className={cn(customNavigationMenuTriggerStyle(), // this function is edited to achieve custom style  
+													"text-md font-semibold leading-6 transition-colors",
+													pathName === item.href ? "text-primary" : "text-foreground")}
+												key={item.href + "menulink"}
+											>
+												<Link key={item.href + "link"} href={item.href}>{item.name}</Link>
+											</CustomNavigationMenuLink>
+										</NavigationMenuItem>
+									)
+								}
+
+								else { // has children
+									// return null
+									return (
+										<NavigationMenuItem>
+											<CustomNavigationMenuTrigger
+												className={cn(
+													"text-md font-semibold leading-6 transition-colors ",
+													pathName === item.href ? "text-primary" : "text-foreground")}
+											>
+												<Link href={item.href} >
+													{item.name}
+												</Link>
+											</CustomNavigationMenuTrigger>
+
+											<NavigationMenuContent>
+												<ul
+													className={cn(
+														"grid w-100 gap-2 ",
+														// "md:w-125 lg:w-150"
+													)
+													}>
+													{item.childen.map((component) => (
+														<ListItem
+															key={component.name}
+															title={component.name}
+															href={component.href}
+														>
+															{component.description}
+														</ListItem>
+													))}
+
+												</ul>
+
+											</NavigationMenuContent>
+
+										</NavigationMenuItem>
+									)
+
+
+								}
+
+							})}
+						</NavigationMenuList>
+					</NavigationMenu>
+
+
+
 				</div>
 
-				<div className='hidden lg:flex'>
+				<div className='hidden lg:flex items-center justify-center gap-2'>
 					<ModeToggle />
+
+					<Button asChild variant={'outline'}>
+						<Link href={"/data-manager"}><FileBracesCorner /> Data</Link>
+					</Button>
 				</div>
 			</nav>
 		</header>
 	)
 }
+
+function ListItem({
+	title,
+	children,
+	href,
+	...props
+}: React.ComponentPropsWithoutRef<"li"> & { href: string }) {
+	return (
+		<li {...props}>
+			<NavigationMenuLink asChild>
+				<Link href={href} className='group'>
+					<div className="flex flex-col gap-1 text-sm">
+						<div className="leading-none font-medium">{title}</div>
+						<div className="text-muted-foreground line-clamp-2 group-hover:text-accent-foreground">{children}</div>
+					</div>
+				</Link>
+			</NavigationMenuLink>
+		</li>
+	)
+}
+
 
 export default SiteHeader

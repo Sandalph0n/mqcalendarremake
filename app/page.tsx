@@ -47,7 +47,7 @@ export default function Home() {
           <div className="max-w-6xl mx-auto px-6 py-16 grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-10 items-center text-white">
             <div className="space-y-5 text-left">
               <span className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-4 py-2 text-sm font-medium backdrop-blur">
-                Student-built, for Macquarie University assessments
+                An assessment planner for Macquarie University, built by students.
               </span>
               <h1 className="text-4xl font-extrabold sm:text-5xl lg:text-6xl leading-tight">
                 Plan every assessment. Keep it local. Start fast.

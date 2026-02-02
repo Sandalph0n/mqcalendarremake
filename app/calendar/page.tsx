@@ -53,8 +53,8 @@ const CalendarPage = () => {
 									<CardContent className="p-4">
 										<Tabs defaultValue="subject" className="w-full">
 											<TabsList className="mb-4 bg-primary ">
-												<TabsTrigger className="border-none text-primary-foreground data-[state=active]:text-foreground" value="subject">Subject planner</TabsTrigger>
-												<TabsTrigger className="border-none text-primary-foreground data-[state=active]:text-foreground" value="semester">Semester planner</TabsTrigger>
+												<TabsTrigger className="border-none text-primary-foreground dark:text-primary-foreground data-[state=active]:text-foreground" value="subject">Subject planner</TabsTrigger>
+												<TabsTrigger className="border-none text-primary-foreground dark:text-primary-foreground data-[state=active]:text-foreground" value="semester">Semester planner</TabsTrigger>
 											</TabsList>
 											<TabsContent value="subject" className="space-y-4">
 												<SubjectCalendar/>
