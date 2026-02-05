@@ -1,6 +1,6 @@
 'use client';
 
-import React from "react";
+import React, { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import SubjectCalendar from "@/components/SubjectHeatmap";
 import SemesterCalendar from "@/components/SemesterHeatmap";
@@ -8,11 +8,16 @@ import GenericCalendar from "@/components/GenericCalendar";
 import { usePlanner } from "@/contexts/PlannerContext";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle , CardFooter} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter, CardAction } from "@/components/ui/card";
 import SummaryCalendar from "@/components/SummaryCalendar";
+import { Settings, X } from "lucide-react";
+import CalendarSetting from "@/components/CalendarSetting";
+
+
 
 const CalendarPage = () => {
 	const { planner } = usePlanner();
+	const [openSetting, setOpenSetting] = useState<boolean>(false);
 	const hasStudyPeriod = !!planner.calendar && Object.keys(planner.calendar?.week ?? {}).length > 0;
 	const hasSubjects = (planner.subjects?.length ?? 0) > 0;
 	const missing: string[] = [];
@@ -49,6 +54,16 @@ const CalendarPage = () => {
 										<CardDescription className="text-muted-foreground">
 											Switch between per-subject focus or semester-wide load.
 										</CardDescription>
+										<CardAction>
+
+											<Button size="icon" variant="outline"
+												onClick={() => (
+													setOpenSetting((prev) => (!prev))
+												)}
+											>
+												<Settings size={56} strokeWidth={2} />
+											</Button>
+										</CardAction>
 									</CardHeader>
 									<CardContent className="p-4">
 										<Tabs defaultValue="subject" className="w-full">
@@ -57,11 +72,11 @@ const CalendarPage = () => {
 												<TabsTrigger className="border-none text-primary-foreground dark:text-primary-foreground data-[state=active]:text-foreground" value="semester">Semester planner</TabsTrigger>
 											</TabsList>
 											<TabsContent value="subject" className="space-y-4">
-												<SubjectCalendar/>
+												<SubjectCalendar />
 											</TabsContent>
 
 											<TabsContent value="semester" className="space-y-4">
-												<SemesterCalendar/>
+												<SemesterCalendar />
 											</TabsContent>
 										</Tabs>
 									</CardContent>
@@ -70,7 +85,7 @@ const CalendarPage = () => {
 											This calendar mirrors your settings from the <Link href="/subject-planner" className="underline underline-offset-2">Subject Planner</Link>. If anything looks off, adjust it there and refresh here.
 										</CardDescription>
 									</CardFooter>
-									
+
 								</Card>
 
 								<SummaryCalendar />
@@ -79,6 +94,9 @@ const CalendarPage = () => {
 					</CardContent>
 				</Card>
 			</div>
+			
+			<CalendarSetting openSetting={openSetting} setOpenSetting={setOpenSetting}/>
+			
 		</div>
 	);
 };

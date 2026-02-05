@@ -46,6 +46,7 @@ export type SubjectProps=  {
 	unitCode?: string
 	unitName?: string
 	unitGuideURL?: string
+	displayColor?: [number, number, number]
 	assessments?: AssessmentProps[]
 	id: string
 }

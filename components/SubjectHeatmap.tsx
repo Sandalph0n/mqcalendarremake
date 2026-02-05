@@ -1,6 +1,6 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { cn } from '@/lib/utils'
-import { SessionCalendarProps, usePlanner } from '@/contexts/PlannerContext'
+import { SessionCalendarProps, SubjectProps, usePlanner } from '@/contexts/PlannerContext'
 import { addDaysLocal, addTimes, plainDateToZonedMidnight, toSydneyPlainDate, toSydneyZonedDateTime, SYDNEY_TZ } from '@/lib/timeUtils';
 import { Temporal } from "temporal-polyfill";
 import { ExternalLink } from "lucide-react";
@@ -27,8 +27,25 @@ type CellData = {
 	}[];
 };
 
+
+
+
 const SubjectCalendar = () => {
-	const { planner } = usePlanner();
+	const { planner, setPlanner } = usePlanner();
+	useEffect(() => {
+		const src = planner.subjects ?? [];
+		if (src.length === 0) return;
+
+		// Nếu tất cả đều có màu thì thôi (quan trọng để không loop)
+		if (!src.some(s => !s.displayColor)) return;
+
+		const subjects = src.map((s, idx) => ({
+			...s,
+			displayColor: s.displayColor ?? SUBJECT_PALETTE[idx % SUBJECT_PALETTE.length],
+		}));
+
+		setPlanner(prev => ({ ...prev, subjects }));
+	}, [planner.subjects]);
 	const subjects = planner.subjects ?? [];
 	const calendar = planner.calendar as SessionCalendarProps;
 	const weeks = planner.calendar?.week ?? {};
@@ -224,7 +241,7 @@ const SubjectCalendar = () => {
 									gridColumnStart: colIdx + 2,
 									backgroundColor: weightToBg(
 										cellMatrix[rowIdx]?.[colIdx]?.weight,
-										SUBJECT_PALETTE[rowIdx % SUBJECT_PALETTE.length]
+										subject.displayColor ?? SUBJECT_PALETTE[rowIdx % SUBJECT_PALETTE.length]
 									),
 								}}
 							>

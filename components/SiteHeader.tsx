@@ -285,11 +285,11 @@ const SiteHeader = () => {
 				</div>
 
 				<div className='hidden lg:flex items-center justify-center gap-2'>
-					<ModeToggle />
-
 					<Button asChild variant={'outline'}>
 						<Link href={"/data-manager"}><FileBracesCorner /> Data</Link>
 					</Button>
+					<ModeToggle />
+
 				</div>
 			</nav>
 		</header>
