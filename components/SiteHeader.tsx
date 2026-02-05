@@ -38,8 +38,12 @@ interface INavigation {
 }
 
 const navigation: INavigation[] = [
+	{ name: "Home", href: "/" },
+	{ name: "Subject Planner", href: "/subject-planner" },
+	{ name: "Calendar", href: "/calendar" },
+	{ name: "About", href: "/about"},
 	{
-		name: "Home", href: "/",
+		name: "Guide", href: "",
 		childen: [
 			{
 				name: "How To Use",
@@ -51,17 +55,8 @@ const navigation: INavigation[] = [
 				href: "/doc",
 				description: "Detailed docs on milestones, editing assessments, and common fixes.",
 			},
-			{
-				name: "About",
-				href: "/about",
-				description: "Meet the student team, core values, and how the app keeps your data transparent.",
-			},
 		]
-	},
-
-	{ name: "Subject Planner", href: "/subject-planner" },
-	{ name: "Calendar", href: "/calendar" },
-
+	}
 ]
 
 
@@ -72,7 +67,7 @@ const MobileNavigation = [
 	{ name: "Calendar", href: "/calendar" },
 	{ name: "About", href: "/about" },
 	{ name: "Document", href: "/doc" },
-	{ name: "Data Manager", href: "/data-manager"}
+	{ name: "Data Manager", href: "/data-manager" }
 
 ]
 {/* <img 
@@ -193,7 +188,7 @@ const SiteHeader = () => {
 								</div>
 
 
-								
+
 
 
 							</CardFooter>
@@ -205,7 +200,7 @@ const SiteHeader = () => {
 
 				{/* Navigation div, show when large */}
 				<div className='hidden lg:flex gap-x-8'>
-					<NavigationMenu>
+					<NavigationMenu viewport={false}>
 						<NavigationMenuList>
 							{navigation.map((item) => {
 								// <Link
@@ -238,18 +233,18 @@ const SiteHeader = () => {
 								else { // has children
 									// return null
 									return (
-										<NavigationMenuItem>
+										<NavigationMenuItem className='left-0.5'>
 											<CustomNavigationMenuTrigger
 												className={cn(
 													"text-md font-semibold leading-6 transition-colors ",
-													pathName === item.href ? "text-primary" : "text-foreground")}
+													[item.href, ...item.childen.map(i => i.href)].includes(pathName) ? "text-primary" : "text-foreground")}
 											>
-												<Link href={item.href} >
+												{item.href ? <Link href={item.href} >
 													{item.name}
-												</Link>
+												</Link> : item.name}
 											</CustomNavigationMenuTrigger>
 
-											<NavigationMenuContent>
+											<NavigationMenuContent >
 												<ul
 													className={cn(
 														"grid w-100 gap-2 ",
@@ -305,10 +300,10 @@ function ListItem({
 	return (
 		<li {...props}>
 			<NavigationMenuLink asChild>
-				<Link href={href} className='group'>
-					<div className="flex flex-col gap-1 text-sm">
+				<Link href={href} className='group/item'>
+					<div className=" flex flex-col gap-1 text-sm">
 						<div className="leading-none font-medium">{title}</div>
-						<div className="text-muted-foreground line-clamp-2 group-hover:text-accent-foreground">{children}</div>
+						<div className="text-foreground! line-clamp-2 group-hover/item:text-accent-foreground!">{children}</div>
 					</div>
 				</Link>
 			</NavigationMenuLink>

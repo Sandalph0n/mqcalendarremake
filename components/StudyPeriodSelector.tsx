@@ -131,7 +131,7 @@ const StudyPeriodSelector = () => {
 	}
 
 	return (
-		<Card className="relative w-full overflow-hidden border-none bg-linear-to-br from-background via-background/70 to-[#f2ede3] dark:to-primary  shadow-lg">
+		<Card className="relative w-full overflow-hidden border-none bg-linear-to-br from-card via-card/70 to-[#f2ede3] dark:to-primary  shadow-lg">
 			<div className="absolute left-0 top-0 h-full w-1 bg-primary" aria-hidden />
 			<CardHeader className="relative flex flex-col gap-3">
 				<div className="flex items-center gap-3">

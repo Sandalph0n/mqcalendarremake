@@ -46,7 +46,7 @@ export default function Home() {
         <div className="relative z-10 w-full">
           <div className="max-w-6xl mx-auto px-6 py-16 grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-10 items-center text-white">
             <div className="space-y-5 text-left">
-              <span className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-4 py-2 text-sm font-medium backdrop-blur">
+              <span className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/20 px-4 py-2 text-sm font-medium backdrop-blur">
                 An assessment planner for Macquarie University, built by students.
               </span>
               <h1 className="text-4xl font-extrabold sm:text-5xl lg:text-6xl leading-tight">
@@ -86,9 +86,9 @@ export default function Home() {
                   return (
                     <Card
                       key={item.title}
-                      className="h-full bg-white/10 backdrop-blur border-white/20 text-white shadow-lg"
+                      className="h-full bg-white/20 backdrop-blur border-white/20 text-white shadow-lg gap-4"
                     >
-                      <CardHeader className="flex flex-row items-start gap-3 pb-2">
+                      <CardHeader className="flex flex-row items-center gap-3 pb-0">
                         <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white/15">
                           <Icon className="size-5" aria-hidden />
                         </span>
