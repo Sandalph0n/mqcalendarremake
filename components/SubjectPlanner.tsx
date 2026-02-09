@@ -16,7 +16,7 @@ const SubjectPlanner = () => {
 
 
 	async function handleFetch() {
-		// setPlanner((prev) => ({...prev, subjects: []}))
+            		// setPlanner((prev) => ({...prev, subjects: []}))
 		// console.log(planner) 
 		// return
 		if (!unitCodeInput) { // check if user entered unit

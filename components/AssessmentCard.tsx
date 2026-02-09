@@ -85,12 +85,6 @@ const AssessmentCard = ({ assessment, index, unitGuideURL, onChange }: Assessmen
 			</div>
 			{/* To do task for student */}
 
-			<div className="my-2 rounded-2xl bg-destructive/20 mx-auto p-3 border border-dashed border-primary w-fit">
-				<p className="text-sm text-muted-foreground text-center">
-						Please read carefully the due date from Unit Guide (Quoted above) and put it mannually bellow
-				</p>
-			</div>
-
 			<div className="mt-3 space-y-2">
 				<div className="flex gap-3 text-xs font-semibold text-muted-foreground">
 					<label className="flex items-center gap-2">

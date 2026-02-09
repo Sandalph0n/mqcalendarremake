@@ -1,16 +1,14 @@
 'use client';
 
 import React, { useState } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import SubjectCalendar from "@/components/SubjectHeatmap";
 import SemesterCalendar from "@/components/SemesterHeatmap";
-import GenericCalendar from "@/components/GenericCalendar";
 import { usePlanner } from "@/contexts/PlannerContext";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter, CardAction } from "@/components/ui/card";
 import SummaryCalendar from "@/components/SummaryCalendar";
-import { Settings, X } from "lucide-react";
+import { Settings } from "lucide-react";
 import CalendarSetting from "@/components/CalendarSetting";
 
 
@@ -52,7 +50,7 @@ const CalendarPage = () => {
 									<CardHeader className="space-y-1">
 										<CardTitle className="text-xl">Assessment Heatmap</CardTitle>
 										<CardDescription className="text-muted-foreground">
-											Switch between per-subject focus or semester-wide load.
+											Review workload per subject and across the semester.
 										</CardDescription>
 										<CardAction>
 
@@ -66,19 +64,23 @@ const CalendarPage = () => {
 										</CardAction>
 									</CardHeader>
 									<CardContent className="p-4">
-										<Tabs defaultValue="subject" className="w-full">
-											<TabsList className="mb-4 bg-primary ">
-												<TabsTrigger className="border-none text-primary-foreground dark:text-primary-foreground data-[state=active]:text-foreground" value="subject">Subject planner</TabsTrigger>
-												<TabsTrigger className="border-none text-primary-foreground dark:text-primary-foreground data-[state=active]:text-foreground" value="semester">Semester planner</TabsTrigger>
-											</TabsList>
-											<TabsContent value="subject" className="space-y-4">
+										<div className="space-y-10">
+											<section className="space-y-4">
+												<div className="space-y-1">
+													<p className="text-sm font-semibold">Subject heatmap</p>
+													<p className="text-xs text-muted-foreground">Workload intensity for each subject.</p>
+												</div>
 												<SubjectCalendar />
-											</TabsContent>
+											</section>
 
-											<TabsContent value="semester" className="space-y-4">
+											<section className="space-y-4">
+												<div className="space-y-1">
+													<p className="text-sm font-semibold">Semester heatmap</p>
+													<p className="text-xs text-muted-foreground">Combined workload across the whole semester.</p>
+												</div>
 												<SemesterCalendar />
-											</TabsContent>
-										</Tabs>
+											</section>
+										</div>
 									</CardContent>
 									<CardFooter>
 										<CardDescription className="text-destructive ">

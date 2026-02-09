@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { AssessmentProps, SubjectProps, usePlanner } from "@/contexts/PlannerContext";
-import { MoreHorizontal, ExternalLink, ClipboardList, X, ClipboardCheck } from "lucide-react";
+import { MoreHorizontal, ExternalLink, ClipboardList, X, ClipboardCheck, Info } from "lucide-react";
 import { Button } from "./ui/button";
 import AssessmentCard from "./AssessmentCard";
 import {
@@ -323,6 +323,19 @@ const SubjectCard = ({ subject, index }: Props) => {
 								<p className="text-sm font-semibold text-foreground/90">
 									{editingSubject.unitName || "Untitled subject"}
 								</p>
+
+								<div className="rounded-xl border border-border bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
+									<div className="flex items-start gap-2">
+										<Info className="mt-0.5 size-4 text-primary" />
+										<div className="space-y-1">
+											<p className="font-semibold text-foreground">Instruction</p>
+											<p>
+												Use the quoted due info in each assessment card to set the correct due date/week.
+											</p>
+										</div>
+									</div>
+								</div>
+
 								{unitGuideURL && (
 									<div
 										className="inline-flex items-center gap-1 text-xs font-semibold text-primary underline underline-offset-4 hover:cursor-pointer"
