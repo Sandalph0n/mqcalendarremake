@@ -17,7 +17,7 @@ import {
 } from "./ui/card";
 
 import { cn } from "@/lib/utils";
-import { Dialog, DialogContent } from "./ui/dialog";
+import { Dialog, DialogContent  } from "./ui/dialog";
 
 type Props = {
 	subject: SubjectProps;
@@ -201,6 +201,8 @@ const SubjectCard = ({ subject, index }: Props) => {
 					<p className="text-sm font-semibold text-foreground/90">
 						{realSubject.unitName || "Untitled subject"}
 					</p>
+
+					
 					{unitGuideURL && (
 						<div className="inline-flex items-center gap-1 text-xs font-semibold text-primary underline underline-offset-4 hover:cursor-pointer"
 							onClick={(e) => {
