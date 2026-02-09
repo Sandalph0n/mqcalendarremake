@@ -7,14 +7,12 @@ import { SubjectProps } from '@/contexts/PlannerContext';
 import SubjectCard from './SubjectCard';
 import Link from 'next/link';
 import { nanoid } from 'nanoid';
-
 const SubjectPlanner = () => {
-	const { planner, setPlanner } = usePlanner();
+	const {planner, setPlanner } = usePlanner();
 
 	const [isFetch, setIsFetch] = useState<boolean>(false);
 	const [unitCodeInput, setUnitCodeInput] = useState<string>("");
 	const [error, setError] = useState<string>("");
-	const [openMap, setOpenMap] = useState<Record<string, boolean>>({});
 
 
 	async function handleFetch() {
@@ -53,7 +51,7 @@ const SubjectPlanner = () => {
 					throw new Error(`Cannot find subject ${unitCodeInput} for period ${planner.year} session ${planner.session}. Please check unit guide and try again.`);
 				}
 				else{
-					throw new Error(`Internal server error. Please check the server`);
+					throw new Error(`Internal server error. Please contact us to report the error!`);
 				}
 			}
 
@@ -90,6 +88,7 @@ const SubjectPlanner = () => {
 
 	return (
 		<Card className="w-full border-none shadow-lg bg-linear-to-br from-background via-background/70 to-[#2f302f]/20 rounded-2xl">
+			
 			<CardHeader className="flex flex-col gap-2">
 				<div className="flex items-center gap-3">
 					<div className="h-11 w-11 rounded-xl bg-secondary text-secondary-foreground flex items-center justify-center shadow-md">

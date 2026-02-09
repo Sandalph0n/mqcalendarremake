@@ -1,23 +1,23 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { AssessmentProps, usePlanner } from "@/contexts/PlannerContext";
 import { ExternalLink } from "lucide-react";
 import { Button } from "./ui/button";
-import { dateFromSydneyKey, isBetweenDates, toSydneyPlainDate, zonedMidnight } from "@/lib/timeUtils";
+import { dateFromSydneyKey, isBetweenDates } from "@/lib/timeUtils";
 
 
 type AssessmentCardProps = {
 	assessment: AssessmentProps;
-	subjectIndex: number;
 	index: number; // assessment index
 	unitGuideURL?: string;
+	onChange: (updates: Partial<AssessmentProps>) => void;
 };
 
-const AssessmentCard = ({ assessment, index, subjectIndex, unitGuideURL }: AssessmentCardProps) => {
+const AssessmentCard = ({ assessment, index, unitGuideURL, onChange }: AssessmentCardProps) => {
 	const [showAdvanced, setShowAdvanced] = useState(false);
 	const [mode, setMode] = useState<"date" | "week">(assessment.dueDate ?  "date" : "week");
-	const { planner, setPlanner } = usePlanner();
+	const { planner } = usePlanner();
 
 	const weekOptions = useMemo(() => {
 		const weeks = planner.calendar?.week ?? {};
@@ -32,35 +32,25 @@ const AssessmentCard = ({ assessment, index, subjectIndex, unitGuideURL }: Asses
 	}, [planner.calendar?.week]);
 
 	function updateAssessment(updates: Partial<AssessmentProps>) {
-		if (updates.dueDate){
-			
-			const auDate = dateFromSydneyKey(updates.dueDate)
-			console.log(updates.dueDate)
-			// return
-			for(const w in planner.calendar!.week){
+		const nextUpdates: Partial<AssessmentProps> = { ...updates };
+		if (typeof nextUpdates.dueDate === "string" && nextUpdates.dueDate) {
+			const auDate = dateFromSydneyKey(nextUpdates.dueDate);
+			const weeks = planner.calendar?.week ?? {};
+			for (const w in weeks) {
+				const startZdt = weeks[w]?.startDate;
+				const endZdt = weeks[w]?.endDate;
+				if (!startZdt || !endZdt || !auDate) continue;
 
-				const start = dateFromSydneyKey(planner.calendar!.week[w].startDate!.toString());
-				const end = dateFromSydneyKey(planner.calendar!.week[w].endDate!.toString());
-				if (start && end && isBetweenDates(start, end, auDate)){
-					updates.dueWeek = Number(w)
-					break
+				const start = dateFromSydneyKey(startZdt.toString());
+				const end = dateFromSydneyKey(endZdt.toString());
+				if (start && end && isBetweenDates(start, end, auDate)) {
+					nextUpdates.dueWeek = Number(w);
+					break;
 				}
 			}
 		}
-		
-		setPlanner((prev) => {
-			const subjects = [...(prev?.subjects ?? [])];
-			const currentSubject = subjects[subjectIndex];
-			if (!currentSubject) return prev ?? { subjects: [] };
 
-			const nextAssessments = [...(currentSubject.assessments ?? [])];
-			const currentAsm = nextAssessments[index] ?? {};
-			nextAssessments[index] = { ...currentAsm, ...updates };
-
-			subjects[subjectIndex] = { ...currentSubject, assessments: nextAssessments };
-			return { ...(prev ?? {}), subjects };
-		});
-
+		onChange(nextUpdates);
 	}
 
 	
@@ -70,7 +60,7 @@ const AssessmentCard = ({ assessment, index, subjectIndex, unitGuideURL }: Asses
 		// Nhưng khi nhập vào date, thì không được xoá week
 		setMode(nextMode);
 		if (nextMode === "date") {
-			updateAssessment({ dueWeek: undefined, dueDate: assessment.dueDate ?? "" });
+			updateAssessment({ dueWeek: undefined, dueDate: assessment.dueDate ?? undefined });
 		} else {
 			updateAssessment({ dueDate: undefined, dueWeek: assessment.dueWeek ?? undefined });
 		}
@@ -89,8 +79,8 @@ const AssessmentCard = ({ assessment, index, subjectIndex, unitGuideURL }: Asses
 						{assessment.dueText ? `Due date written in the Unit Guide: \"${assessment.dueText}\"` : "No due info"}
 					</p>
 				</div>
-				<span className="rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-semibold text-primary">
-					{assessment.weighting ?? 0}%
+				<span className="rounded-full bg-primary/10 px-2 py-0.5 text-[12px] font-semibold text-primary">
+					Weighting:  {assessment.weighting ?? 0}%
 				</span>
 			</div>
 			{/* To do task for student */}
