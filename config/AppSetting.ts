@@ -1,5 +1,5 @@
 const APP_SETTING = {
-    period_year_min: 2024,
+    period_year_min: 2025,
     period_year_max: 2026,
 
     period_session_min: 1,
