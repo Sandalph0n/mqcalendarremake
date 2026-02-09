@@ -1,5 +1,5 @@
 import { NextResponse, NextRequest } from "next/server";
-import { AssignmentProps, SubjectProps } from "@/contexts/PlannerContext";
+import { AssessmentProps, SubjectProps } from "@/contexts/PlannerContext";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
@@ -38,18 +38,18 @@ export async function fetchSubjectFromUnitGuide(
     );
     result.year = Number(sessionText.split("–")[0]?.trim());
 
-    let assignmentTable = document.getElementById("assessment-tasks-section");
-    if (!assignmentTable) {
-        throw new Error("Assignments Not Found");
+    let assessmentTable = document.getElementById("assessment-tasks-section");
+    if (!assessmentTable) {
+        throw new Error("Assessments Not Found");
     }
-    assignmentTable = assignmentTable.getElementsByTagName("table")[0];
-    assignmentTable = assignmentTable.getElementsByTagName("tbody")[0];
+    assessmentTable = assessmentTable.getElementsByTagName("table")[0];
+    assessmentTable = assessmentTable.getElementsByTagName("tbody")[0];
 
-    const assingments = assignmentTable.getElementsByTagName("tr");
-    const parsedAssignments: AssignmentProps[] = [];
+    const assingments = assessmentTable.getElementsByTagName("tr");
+    const parsedAssessments: AssessmentProps[] = [];
 
     for (const asm of assingments) {
-        const parsedAsm: AssignmentProps = {
+        const parsedAsm: AssessmentProps = {
             name: "",
             weighting: 0,
             isWeekly: false,
@@ -97,11 +97,11 @@ export async function fetchSubjectFromUnitGuide(
         const weeklyText = `${parsedAsm.name} ${parsedAsm.dueText}`.toLowerCase();
         parsedAsm.isWeekly = weeklyText.includes("weekly");
 
-        parsedAssignments.push(parsedAsm);
+        parsedAssessments.push(parsedAsm);
     }
 
     result.unitGuideURL = subjectURL;
-    result.assignments = parsedAssignments;
+    result.assessments = parsedAssessments;
 
     return result;
 }

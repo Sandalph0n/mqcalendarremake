@@ -7,18 +7,16 @@ import { SubjectProps } from '@/contexts/PlannerContext';
 import SubjectCard from './SubjectCard';
 import Link from 'next/link';
 import { nanoid } from 'nanoid';
-
 const SubjectPlanner = () => {
-	const { planner, setPlanner } = usePlanner();
+	const {planner, setPlanner } = usePlanner();
 
 	const [isFetch, setIsFetch] = useState<boolean>(false);
 	const [unitCodeInput, setUnitCodeInput] = useState<string>("");
 	const [error, setError] = useState<string>("");
-	const [openMap, setOpenMap] = useState<Record<string, boolean>>({});
 
 
 	async function handleFetch() {
-		// setPlanner((prev) => ({...prev, subjects: []}))
+            		// setPlanner((prev) => ({...prev, subjects: []}))
 		// console.log(planner) 
 		// return
 		if (!unitCodeInput) { // check if user entered unit
@@ -49,8 +47,12 @@ const SubjectPlanner = () => {
 			});
 
 			if (!res.ok) {
-
-				throw new Error(`Request failed ${res.status}`);
+				if (res.status == 404){
+					throw new Error(`Cannot find subject ${unitCodeInput} for period ${planner.year} session ${planner.session}. Please check unit guide and try again.`);
+				}
+				else{
+					throw new Error(`Internal server error. Please contact us to report the error!`);
+				}
 			}
 
 			const data = await res.json() as { subject: SubjectProps };
@@ -86,6 +88,7 @@ const SubjectPlanner = () => {
 
 	return (
 		<Card className="w-full border-none shadow-lg bg-linear-to-br from-background via-background/70 to-[#2f302f]/20 rounded-2xl">
+			
 			<CardHeader className="flex flex-col gap-2">
 				<div className="flex items-center gap-3">
 					<div className="h-11 w-11 rounded-xl bg-secondary text-secondary-foreground flex items-center justify-center shadow-md">
@@ -93,7 +96,7 @@ const SubjectPlanner = () => {
 					</div>
 					<div>
 						<CardTitle className="text-xl">Subject Planner</CardTitle>
-						<CardDescription>Fetch and manage your unit assignments.</CardDescription>
+						<CardDescription>Fetch and manage your unit assessments.</CardDescription>
 					</div>
 				</div>
 			</CardHeader>
@@ -103,6 +106,8 @@ const SubjectPlanner = () => {
 						type="text"
 						placeholder="Enter Unit Code, e.g. COMP1000"
 						className="w-full rounded-md border px-3 py-2 bg-white/80 dark:bg-secondary/80 dark:text-white/80"
+						
+						// className="w-full rounded-md border px-3 py-2 bg-secondary-foreground/80 dark:text-white/80"
 						value={unitCodeInput}
 						onChange={handleChangeUnit}
 						onKeyDown={(e) => {

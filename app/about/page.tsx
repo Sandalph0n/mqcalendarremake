@@ -26,7 +26,7 @@ export default function AboutPage() {
     {
       title: "Student First",
       description:
-        "Built by students, for students. We understand the challenges of managing multiple assignments and deadlines.",
+        "Built by students, for students. We understand the challenges of managing multiple assessments and deadlines.",
       icon: User,
     },
     {
@@ -52,7 +52,7 @@ export default function AboutPage() {
   const features = [
     {
       icon: LayoutList,
-      title: "Plan and manage your assignments",
+      title: "Plan and manage your assessments",
       description:
         "Collect unit guides, capture every task, and keep everything organised in one place.",
     },

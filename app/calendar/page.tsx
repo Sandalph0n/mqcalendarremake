@@ -1,18 +1,21 @@
 'use client';
 
-import React from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import React, { useState } from "react";
 import SubjectCalendar from "@/components/SubjectHeatmap";
 import SemesterCalendar from "@/components/SemesterHeatmap";
-import GenericCalendar from "@/components/GenericCalendar";
 import { usePlanner } from "@/contexts/PlannerContext";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle , CardFooter} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter, CardAction } from "@/components/ui/card";
 import SummaryCalendar from "@/components/SummaryCalendar";
+import { Settings } from "lucide-react";
+import CalendarSetting from "@/components/CalendarSetting";
+
+
 
 const CalendarPage = () => {
 	const { planner } = usePlanner();
+	const [openSetting, setOpenSetting] = useState<boolean>(false);
 	const hasStudyPeriod = !!planner.calendar && Object.keys(planner.calendar?.week ?? {}).length > 0;
 	const hasSubjects = (planner.subjects?.length ?? 0) > 0;
 	const missing: string[] = [];
@@ -45,32 +48,46 @@ const CalendarPage = () => {
 							<>
 								<Card className="border-border bg-card/90 shadow-sm">
 									<CardHeader className="space-y-1">
-										<CardTitle className="text-xl">Assignment Heatmap</CardTitle>
+										<CardTitle className="text-xl">Assessment Heatmap</CardTitle>
 										<CardDescription className="text-muted-foreground">
-											Switch between per-subject focus or semester-wide load.
+											Review workload per subject and across the semester.
 										</CardDescription>
+										<CardAction>
+
+											<Button size="icon" variant="outline"
+												onClick={() => (
+													setOpenSetting((prev) => (!prev))
+												)}
+											>
+												<Settings size={56} strokeWidth={2} />
+											</Button>
+										</CardAction>
 									</CardHeader>
 									<CardContent className="p-4">
-										<Tabs defaultValue="subject" className="w-full">
-											<TabsList className="mb-4">
-												<TabsTrigger value="subject">Subject planner</TabsTrigger>
-												<TabsTrigger value="semester">Semester planner</TabsTrigger>
-											</TabsList>
-											<TabsContent value="subject" className="space-y-4">
-												<SubjectCalendar/>
-											</TabsContent>
+										<div className="space-y-10">
+											<section className="space-y-4">
+												<div className="space-y-1">
+													<p className="text-sm font-semibold">Subject heatmap</p>
+													<p className="text-xs text-muted-foreground">Workload intensity for each subject.</p>
+												</div>
+												<SubjectCalendar />
+											</section>
 
-											<TabsContent value="semester" className="space-y-4">
-												<SemesterCalendar/>
-											</TabsContent>
-										</Tabs>
+											<section className="space-y-4">
+												<div className="space-y-1">
+													<p className="text-sm font-semibold">Semester heatmap</p>
+													<p className="text-xs text-muted-foreground">Combined workload across the whole semester.</p>
+												</div>
+												<SemesterCalendar />
+											</section>
+										</div>
 									</CardContent>
 									<CardFooter>
-										<CardDescription className="text-destructive/40 ">
+										<CardDescription className="text-destructive ">
 											This calendar mirrors your settings from the <Link href="/subject-planner" className="underline underline-offset-2">Subject Planner</Link>. If anything looks off, adjust it there and refresh here.
 										</CardDescription>
 									</CardFooter>
-									
+
 								</Card>
 
 								<SummaryCalendar />
@@ -79,6 +96,9 @@ const CalendarPage = () => {
 					</CardContent>
 				</Card>
 			</div>
+			
+			<CalendarSetting openSetting={openSetting} setOpenSetting={setOpenSetting}/>
+			
 		</div>
 	);
 };

@@ -7,7 +7,7 @@ import { Temporal } from "temporal-polyfill";
 
 
 export type MilestoneMap = Partial<Record<PeriodMileStoneKey, string>>;
-export type AssignmentProps = {
+export type AssessmentProps = {
 	name?: string
 	weighting?: number
 	isWeekly?: boolean
@@ -46,7 +46,8 @@ export type SubjectProps=  {
 	unitCode?: string
 	unitName?: string
 	unitGuideURL?: string
-	assignments?: AssignmentProps[]
+	displayColor?: [number, number, number]
+	assessments?: AssessmentProps[]
 	id: string
 }
 

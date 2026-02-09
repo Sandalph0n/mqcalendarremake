@@ -2,18 +2,18 @@ import React from "react";
 import type { Metadata } from "next";
 import { ThemeProvider } from "next-themes";
 import "./globals.css";
-import {Inter} from "next/font/google";
+import { Inter } from "next/font/google";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import { PlannerProvider } from "@/contexts/PlannerContext";
 
 
-const inter = Inter({subsets:["latin"]})
+const inter = Inter({ subsets: ["latin"] })
 
 
 export const metadata: Metadata = {
-  title: "MQ Assignment Planner",
-  description: "Manage, Visualize and Genarate Assignment Calendar for Macquarie University Students",
+  title: "MQ Assessment Planner",
+  description: "Manage, Visualize and Genarate Assessment Calendar for Macquarie University Students",
   icons: {
     // icon: "/favicon.ico",
     // shortcut: "/favicon.ico",
@@ -35,13 +35,13 @@ export default function RootLayout({
         <ThemeProvider
           attribute="class"
           defaultTheme="light"
-          // enableSystem  
+        // enableSystem  
         >
           <PlannerProvider>
             <div className="min-h-screen flex flex-col">
-              <SiteHeader/>
+              <SiteHeader />
               <main className="flex-1">{children}</main>
-              <SiteFooter/>
+              <SiteFooter />
             </div>
           </PlannerProvider>
         </ThemeProvider>

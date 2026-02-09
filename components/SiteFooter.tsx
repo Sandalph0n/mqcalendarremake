@@ -19,7 +19,7 @@ const SiteFooter = () => {
             </Link>
           ))}
         </div>
-        <p className="text-sm text-gray-200">© 2025 MQ Assignment Planner. All rights reserved.</p>
+        <p className="text-sm text-gray-200">© 2025 MQ Assessment Planner. All rights reserved.</p>
       </div>
     </footer>
   );

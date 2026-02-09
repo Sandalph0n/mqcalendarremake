@@ -1,13 +1,13 @@
 import React from "react";
 import { cn } from "@/lib/utils";
-import { SessionCalendarProps, usePlanner } from "@/contexts/PlannerContext";
+import { SessionCalendarProps, SubjectProps, usePlanner } from "@/contexts/PlannerContext";
 import { addDaysLocal, addTimes, plainDateToZonedMidnight, toSydneyPlainDate, toSydneyZonedDateTime, SYDNEY_TZ } from "@/lib/timeUtils";
 import { ExternalLink } from "lucide-react";
 import { Temporal } from "temporal-polyfill";
 
 type CellData = {
   weight: number;
-  assignments: {
+  assessments: {
     subject?: string;
     name?: string;
     weighting?: number;
@@ -19,10 +19,22 @@ type CellData = {
 };
 
 const PRIMARY_BASE: [number, number, number] = [198, 32, 62];
+const SECONDARY_BASE: [number, number, number] = [32, 32, 197];
+
 
 const SemesterCalendar = () => {
   const { planner } = usePlanner();
-  const subjects = planner.subjects ?? [];
+  const cloneSubjects = planner.subjects ?? [];
+  const subjects = [...cloneSubjects];
+
+  if (subjects.length > 0) {
+    const newOverall: SubjectProps = {
+      id: "overallSemesterEntry",
+      unitCode: "Overall %"
+    }
+    subjects.push(newOverall);
+  }
+
   const calendar = planner.calendar as SessionCalendarProps;
   const weeks = planner.calendar?.week ?? {};
   const weekEntries = Object.entries(weeks)
@@ -35,6 +47,7 @@ const SemesterCalendar = () => {
     .filter(Boolean)
     .sort((a, b) => a!.number - b!.number) as { number: number; label: string }[];
 
+  
   const headerHeight = "2.75rem";
   const rowHeight = "3rem";
   const subjectColWidth = "7rem";
@@ -88,15 +101,25 @@ const SemesterCalendar = () => {
 
   // Build per-subject cell data
   const cellMatrix: CellData[][] = subjects.map(() =>
-    weekEntries.map(() => ({ weight: 0, assignments: [] }))
+    weekEntries.map(() => ({ weight: 0, assessments: [] }))
   );
+  // Build overall percentage data
+
+  const overallIdx = cellMatrix.length - 1;
+  // console.log(overallIdx)
+  // console.log(cellMatrix[overallIdx].length)
+
+
+
+
+  // console.log(cellMatrix)
   subjects.forEach((subject, sIdx) => {
-    for (const asm of subject.assignments ?? []) {
+    for (const asm of subject.assessments ?? []) {
       if (!asm.dueWeek) continue;
       const colIdx = weekEntries.findIndex((w) => w.number === asm.dueWeek);
       if (colIdx < 0) continue;
       cellMatrix[sIdx][colIdx].weight += asm.weighting ?? 0;
-      cellMatrix[sIdx][colIdx].assignments.push({
+      cellMatrix[sIdx][colIdx].assessments.push({
         subject: subject.unitCode || subject.unitName,
         name: asm.name,
         weighting: asm.weighting,
@@ -108,16 +131,25 @@ const SemesterCalendar = () => {
     }
   });
 
+    for (let i = 0; i < cellMatrix[overallIdx].length; i++){ // column iteration
+      let totalPerW = 0;
+      for (let j = 0; j < subjects.length-1; j ++ ){// row iteration
+        totalPerW += cellMatrix[j][i].weight;
+      } 
+      cellMatrix[overallIdx][i].weight = totalPerW;
+    }
+
+
   // Total weight per week across all subjects (for column-wide colouring)
   const columnWeights = weekEntries.map((_, colIdx) =>
     subjects.reduce((acc, _subj, sIdx) => acc + (cellMatrix[sIdx]?.[colIdx]?.weight ?? 0), 0)
   );
   const maxColumnWeight = columnWeights.length ? Math.max(...columnWeights, 0.0001) : 0.0001;
-  const columnWeightToBg = (weight: number) => {
+  const columnWeightToBg = (weight: number, base: [number, number, number]) => {
     if (!weight || weight <= 0) return undefined;
     const ratio = Math.min(weight / maxColumnWeight, 1);
-    const alpha = 0.15 + ratio * 0.6; // 0.15 -> 0.75 scaled by heaviest week
-    return `rgba(${PRIMARY_BASE[0]}, ${PRIMARY_BASE[1]}, ${PRIMARY_BASE[2]}, ${alpha.toFixed(3)})`;
+    const alpha = 0.25 + ratio * 0.6; // 0.15 -> 0.75 scaled by heaviest week
+    return `rgba(${base[0]}, ${base[1]}, ${base[2]}, ${alpha.toFixed(3)})`;
   };
 
   return (
@@ -192,7 +224,9 @@ const SemesterCalendar = () => {
             subjects.map((subject, idx) => (
               <div
                 key={`subj-${subject.unitCode || idx}`}
-                className="flex items-center px-3 text-sm bg-card sticky left-0 z-10"
+                className={cn("flex items-center px-3 text-sm bg-card sticky left-0 z-10",
+                  idx == subjects.length -1 ? "border-t border-gray-600/40" : ""
+                )}
                 style={{ gridRowStart: idx + 2 }}
               >
                 {subject.unitCode || subject.unitName || `Subject ${idx + 1}`}
@@ -205,22 +239,28 @@ const SemesterCalendar = () => {
             weekEntries.map((w, colIdx) => (
               <div
                 key={`cell-${rowIdx}-${w.number}`}
-                className="relative flex items-center justify-center text-xs text-muted-foreground bg-background/60 group"
+                className={cn("relative flex items-center justify-center text-xs bg-background/60 group",
+                  rowIdx == subjects.length -1 ? "border-t border-gray-600/40" : "",
+                  cellMatrix[rowIdx]?.[colIdx]?.weight ?" text-gray-100 ": "text-muted-foreground"
+                )}
                 style={{
                   gridRowStart: rowIdx + 2,
                   gridColumnStart: colIdx + 2,
                   // Colour entire column based on total weekly load (even if this subject has none)
-                  backgroundColor: columnWeightToBg(columnWeights[colIdx]),
+                  // textShadow: !cellMatrix[rowIdx]?.[colIdx]?.weight ? "0 1px 2px rgba(0, 0, 0, 0.35)" : "none",
+                  textShadow: cellMatrix[rowIdx]?.[colIdx]?.weight ? "0 1px 2px rgba(0, 0, 0, 0.35)" : "none",
+
+                  backgroundColor: columnWeightToBg(columnWeights[colIdx], rowIdx != subjects.length-1 ? PRIMARY_BASE: SECONDARY_BASE),
                 }}
               >
                 {cellMatrix[rowIdx]?.[colIdx]?.weight
                   ? cellMatrix[rowIdx][colIdx].weight.toFixed(1)
                   : "—"}
-                {cellMatrix[rowIdx]?.[colIdx]?.assignments.length ? (
+                {cellMatrix[rowIdx]?.[colIdx]?.assessments.length ? (
                   <div className="absolute z-50 hidden w-72 max-w-[18rem] -translate-x-1/2 -translate-y-2 whitespace-normal rounded-md border border-border bg-card p-3 text-foreground shadow-lg group-hover:block">
-                    <div className="text-xs font-semibold mb-1">Assignments</div>
+                    <div className="text-xs font-semibold mb-1">Assessments</div>
                     <div className="space-y-2">
-                      {cellMatrix[rowIdx][colIdx].assignments.map((asm, idx) => (
+                      {cellMatrix[rowIdx][colIdx].assessments.map((asm, idx) => (
                         <div key={`c-${rowIdx}-${colIdx}-${idx}`} className="text-xs">
                           <div className="font-semibold">{subject.unitCode ? `${subject.unitCode}: ` : ""}{asm.name || "Untitled"}</div>
                           <div className="text-muted-foreground">
