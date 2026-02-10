@@ -58,8 +58,10 @@ export default function Contributors() {
               type="button"
               variant="ghost"
               className={[
-                "group relative size-14 overflow-hidden rounded-full border-0 bg-transparent p-0 shadow-none",
-                "text-foreground transition-all duration-300",
+                "group relative size-14 overflow-hidden rounded-full border-0 p-0 shadow-none",
+                "bg-gradient-to-r from-primary via-accent to-primary text-primary-foreground",
+                "bg-[length:200%_200%] bg-[position:0%_50%] transition-[background-position] duration-700 ease-out",
+                "group-hover:bg-[position:100%_50%] data-[state=open]:bg-[position:100%_50%]",
                 "hover:-translate-y-0.5",
                 "focus-visible:outline-none focus-visible:ring-0",
               ].join(" ")}
