@@ -75,7 +75,7 @@ const AssessmentCard = ({ assessment, index, unitGuideURL, onChange }: Assessmen
 					<p className="text-sm font-semibold leading-tight">
 						{assessment.name || `Assessment ${index + 1}`}
 					</p>
-					<p className="text-xs text-muted-foreground">
+					<p className="text-xs text-primary">
 						{assessment.dueText ? `Due date written in the Unit Guide: \"${assessment.dueText}\"` : "No due info"}
 					</p>
 				</div>
