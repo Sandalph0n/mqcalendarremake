@@ -51,14 +51,14 @@ export default function Contributors() {
         <Collapsible
           open={goatOpen}
           onOpenChange={setGoatOpen}
-          className="flex w-full flex-col gap-2"
+          className="flex w-full flex-col gap-2 items-center"
         >
           <CollapsibleTrigger asChild>
             <Button
               type="button"
               variant="ghost"
               className={[
-                "group relative w-full overflow-hidden rounded-xl border-0 bg-transparent px-4 py-6 shadow-none",
+                "group relative size-14 overflow-hidden rounded-full border-0 bg-transparent p-0 shadow-none",
                 "text-foreground transition-all duration-300",
                 "hover:-translate-y-0.5",
                 "focus-visible:outline-none focus-visible:ring-0",
