@@ -193,7 +193,7 @@ const SubjectCard = ({ subject, index }: Props) => {
 							<span className="flex items-center gap-1 rounded-md bg-destructive px-2 py-1 font-medium text-destructive-foreground">
 								<ClipboardList className="size-3.5" />
 								{notFinishedAsm} assessment
-								{notFinishedAsm > 1 ? "s" : ""} not finished
+								{notFinishedAsm > 1 ? "s" : ""} not set up
 							</span>
 						)}
 						{notFinishedAsm === 0 && assessments.length > 0 && (
@@ -203,9 +203,9 @@ const SubjectCard = ({ subject, index }: Props) => {
 							</span>
 						)}
 					</div>
-					<p className="text-sm font-semibold text-foreground/90">
+					{/* <p className="text-sm font-semibold text-foreground/90">
 						{realSubject.unitName || "Untitled subject"}
-					</p>
+					</p> */}
 					{unitGuideURL && (
 						<div className="inline-flex items-center gap-1 text-xs font-semibold text-primary underline underline-offset-4 hover:cursor-pointer"
 							onClick={(e) => {
