@@ -2,9 +2,9 @@
 
 import React, { useMemo, useState } from "react";
 import { AssessmentProps, usePlanner } from "@/contexts/PlannerContext";
-import { ExternalLink } from "lucide-react";
+import { CalendarDays, ExternalLink } from "lucide-react";
 import { Button } from "./ui/button";
-import { dateFromSydneyKey, isBetweenDates } from "@/lib/timeUtils";
+import PeriodCalendarPopup from "./PeriodCalendarPopup";
 
 
 type AssessmentCardProps = {
@@ -16,8 +16,10 @@ type AssessmentCardProps = {
 
 const AssessmentCard = ({ assessment, index, unitGuideURL, onChange }: AssessmentCardProps) => {
 	const [showAdvanced, setShowAdvanced] = useState(false);
-	const [mode, setMode] = useState<"date" | "week">(assessment.dueDate ?  "date" : "week");
+	const [calendarOpen, setCalendarOpen] = useState(false);
 	const { planner } = usePlanner();
+
+	const isMissingDue = !assessment.dueDate && !assessment.dueWeek;
 
 	const weekOptions = useMemo(() => {
 		const weeks = planner.calendar?.week ?? {};
@@ -33,38 +35,29 @@ const AssessmentCard = ({ assessment, index, unitGuideURL, onChange }: Assessmen
 
 	function updateAssessment(updates: Partial<AssessmentProps>) {
 		const nextUpdates: Partial<AssessmentProps> = { ...updates };
-		if (typeof nextUpdates.dueDate === "string" && nextUpdates.dueDate) {
-			const auDate = dateFromSydneyKey(nextUpdates.dueDate);
-			const weeks = planner.calendar?.week ?? {};
-			for (const w in weeks) {
-				const startZdt = weeks[w]?.startDate;
-				const endZdt = weeks[w]?.endDate;
-				if (!startZdt || !endZdt || !auDate) continue;
+		
+		// If a dueDate is provided, clear any manually set dueWeek.
+		// If a numeric dueWeek is provided, clear any existing dueDate.
+		if (
+			Object.prototype.hasOwnProperty.call(nextUpdates, "dueDate") &&
+			typeof nextUpdates.dueDate === "string" &&
+			nextUpdates.dueDate
+		) {
+			nextUpdates.dueWeek = undefined;
+		}
 
-				const start = dateFromSydneyKey(startZdt.toString());
-				const end = dateFromSydneyKey(endZdt.toString());
-				if (start && end && isBetweenDates(start, end, auDate)) {
-					nextUpdates.dueWeek = Number(w);
-					break;
-				}
-			}
+		if (
+			Object.prototype.hasOwnProperty.call(nextUpdates, "dueWeek") &&
+			typeof nextUpdates.dueWeek === "number" &&
+			!Number.isNaN(nextUpdates.dueWeek)
+		) {
+			nextUpdates.dueDate = undefined;
 		}
 
 		onChange(nextUpdates);
 	}
 
 	
-
-	function handleModeChange(nextMode: "date" | "week") {
-		// Khi nhập vào week, thì tự động xoá date
-		// Nhưng khi nhập vào date, thì không được xoá week
-		setMode(nextMode);
-		if (nextMode === "date") {
-			updateAssessment({ dueWeek: undefined, dueDate: assessment.dueDate ?? undefined });
-		} else {
-			updateAssessment({ dueDate: undefined, dueWeek: assessment.dueWeek ?? undefined });
-		}
-	}
 
 	return (
 		<div
@@ -85,40 +78,32 @@ const AssessmentCard = ({ assessment, index, unitGuideURL, onChange }: Assessmen
 			</div>
 			{/* To do task for student */}
 
-			<div className="mt-3 space-y-2">
-				<div className="flex gap-3 text-xs font-semibold text-muted-foreground">
-					<label className="flex items-center gap-2">
-						<input
-							type="radio"
-							name={`due-mode-${index}`}
-							checked={mode === "date"}
-							onChange={() => handleModeChange("date")}
-						/>
-						Enter date
-					</label>
-					<label className="flex items-center gap-2">
-						<input
-							type="radio"
-							name={`due-mode-${index}`}
-							checked={mode === "week"}
-							onChange={() => handleModeChange("week")}
-						/>
-						Enter week
-					</label>
-				</div>
-				{mode === "date" ? (
-					<label className="flex flex-col gap-1 text-xs font-semibold text-muted-foreground">
-						Due date (YYYY-MM-DD)
+			<div className="mt-3 space-y-3">
+				<label className="flex flex-col gap-1 text-xs font-semibold text-muted-foreground">
+					Due date (YYYY-MM-DD)
+					<div className="flex gap-2">
 						<input
 							type="date"
-							className="w-full rounded-md border px-2 py-2 text-sm bg-background"
+							className="w-full rounded-md border px-2 py-2 text-sm bg-background date-input-no-native-icon"
 							value={assessment.dueDate ?? ""}
 							onChange={(e) => updateAssessment({ dueDate: e.target.value || undefined })}
 						/>
-					</label>
-				) : (
-					<label className="flex flex-col gap-1 text-xs font-semibold text-muted-foreground">
-						Due week (choose from calendar)
+						<Button
+							type="button"
+							variant="outline"
+							size="icon"
+							className="shrink-0"
+							title="Open calendar to pick date/week"
+							onClick={() => setCalendarOpen(true)}
+						>
+							<CalendarDays className="size-4" />
+						</Button>
+					</div>
+				</label>
+
+				<label className="flex flex-col gap-1 text-xs font-semibold text-muted-foreground">
+					Due week
+					<div className="flex gap-2">
 						<select
 							className="w-full rounded-md border px-2 py-2 text-sm bg-background"
 							value={assessment.dueWeek ?? ""}
@@ -126,7 +111,6 @@ const AssessmentCard = ({ assessment, index, unitGuideURL, onChange }: Assessmen
 								const parsed = parseInt(e.target.value, 10);
 								updateAssessment({
 									dueWeek: Number.isNaN(parsed) ? undefined : parsed,
-									dueDate: undefined,
 								});
 							}}
 						>
@@ -137,7 +121,13 @@ const AssessmentCard = ({ assessment, index, unitGuideURL, onChange }: Assessmen
 								</option>
 							))}
 						</select>
-					</label>
+					</div>
+				</label>
+
+				{isMissingDue && (
+					<p className="text-[11px] font-medium text-destructive">
+						Please select either a due date or a due week.
+					</p>
 				)}
 			</div>
 
@@ -230,6 +220,24 @@ const AssessmentCard = ({ assessment, index, unitGuideURL, onChange }: Assessmen
 					View in Unit Guide <ExternalLink className="size-3.5" />
 				</a>
 			)}
+
+			<PeriodCalendarPopup
+				open={calendarOpen}
+				onOpenChange={setCalendarOpen}
+				selectedWeek={assessment.dueWeek}
+				selectedDate={assessment.dueDate}
+				onSelectWeek={(weekNum) => {
+					updateAssessment({
+						dueWeek: weekNum,
+					});
+				}}
+				onSelectDate={(dateStr) => {
+					updateAssessment({
+						dueDate: dateStr,
+					});
+				}}
+			/>
+
 		</div>
 	);
 };

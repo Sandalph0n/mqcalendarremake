@@ -134,9 +134,38 @@ const SubjectCalendar = () => {
 
 	subjects.forEach((subject, sIdx) => {
 		for (const asm of subject.assessments ?? []) {
-			if (!asm.dueWeek) continue;
-			const colIdx = weekEntries.findIndex((w) => w.number === asm.dueWeek);
+			// Prefer an explicitly chosen dueWeek. If it's missing, infer the week
+			// from the dueDate so that date-only assessments still appear.
+			let weekNum = asm.dueWeek;
+
+			if (!weekNum && asm.dueDate) {
+				const due = toSydneyZonedDateTime(asm.dueDate);
+				if (due) {
+					for (const [wKey, wData] of Object.entries(calendar.week ?? {})) {
+						const wNumber = Number(wKey);
+						if (Number.isNaN(wNumber)) continue;
+						if (wData.startDate && wData.endDate) {
+							const start = toSydneyZonedDateTime(wData.startDate);
+							const end = toSydneyZonedDateTime(wData.endDate);
+							if (
+								start &&
+								end &&
+								Temporal.ZonedDateTime.compare(due, start) >= 0 &&
+								Temporal.ZonedDateTime.compare(due, end) < 0
+							) {
+								weekNum = wNumber;
+								break;
+							}
+						}
+					}
+				}
+			}
+
+			if (!weekNum) continue;
+
+			const colIdx = weekEntries.findIndex((w) => w.number === weekNum);
 			if (colIdx < 0) continue;
+
 			cellMatrix[sIdx][colIdx].weight += asm.weighting ?? 0;
 			cellMatrix[sIdx][colIdx].assessments.push({
 				name: asm.name,

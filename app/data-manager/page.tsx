@@ -32,8 +32,20 @@ const readSavedContexts = (): SavedItem[] => {
   return [];
 };
 
+// Use a fixed locale and timezone so that server and client
+// render the same text during hydration.
+const DATE_FORMATTER = new Intl.DateTimeFormat("en-AU", {
+  year: "numeric",
+  month: "short",
+  day: "2-digit",
+  hour: "2-digit",
+  minute: "2-digit",
+  hour12: false,
+  timeZone: "Australia/Sydney",
+});
+
 function formatDate(iso: string) {
-  return new Date(iso).toLocaleString();
+  return DATE_FORMATTER.format(new Date(iso));
 }
 
 export default function DataManagerPage() {

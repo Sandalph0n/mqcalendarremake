@@ -81,17 +81,15 @@ const SiteHeader = () => {
 	const pathName = usePathname()
 	const { theme, resolvedTheme } = useTheme();
 	const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+	// Avoid hydration mismatch by only rendering once the theme
+	// value has been resolved on the client.
+	const [mounted, setMounted] = useState(false);
+	useEffect(() => setMounted(true), []);
+	if (!mounted) return null; // stop render if not yet mounted, avoid mismatch
+
 	const current = resolvedTheme || theme; // handles 'system'
 	const logo = current === "dark" ? DarkLogo : LightLogo;
-
-	// useEffect(()=>{
-	// 	console.log("theme: ", theme);
-	// 	console.log("resolvedTheme: ", resolvedTheme);
-	// },[theme, resolvedTheme]);
-
-	// const [mounted, setMounted] = useState(false);
-	// useEffect(() => setMounted(true), []);
-	// if (!mounted) return null; // stop render if not yet mounted, avoid mismatch
 
 
 	return (
@@ -216,7 +214,7 @@ const SiteHeader = () => {
 
 								if (!item.childen) { // no children
 									return (
-										<NavigationMenuItem>
+										<NavigationMenuItem key={item.href}>
 											<CustomNavigationMenuLink
 												asChild
 												className={cn(customNavigationMenuTriggerStyle(), // this function is edited to achieve custom style  
@@ -233,7 +231,7 @@ const SiteHeader = () => {
 								else { // has children
 									// return null
 									return (
-										<NavigationMenuItem className='left-0.5'>
+										<NavigationMenuItem key={item.href} className='left-0.5'>
 											<CustomNavigationMenuTrigger
 												className={cn(
 													"text-md font-semibold leading-6 transition-colors ",
