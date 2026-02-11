@@ -17,7 +17,7 @@ import {
 } from "./ui/card";
 
 import { cn } from "@/lib/utils";
-import { Dialog, DialogContent } from "./ui/dialog";
+import { Dialog, DialogContent  } from "./ui/dialog";
 
 type Props = {
 	subject: SubjectProps;
@@ -202,20 +202,22 @@ const SubjectCard = ({ subject, index }: Props) => {
 								Good to go
 							</span>
 						)}
-
-						{unitGuideURL && (
-							<button
-								type="button"
-								className="inline-flex items-center gap-1 rounded-md bg-muted px-2 py-1 font-semibold text-primary underline-offset-4 hover:bg-muted/80 cursor-pointer"
-								onClick={(e) => {
-									e.preventDefault();
-									window.open(unitGuideURL, "_blank", "noopener,noreferrer");
-								}}
-							>
-								Open Unit Guide <ExternalLink className="size-3.5" />
-							</button>
-						)}
 					</div>
+					<p className="text-sm font-semibold text-foreground/90">
+						{realSubject.unitName || "Untitled subject"}
+					</p>
+					{unitGuideURL && (
+						<div className="inline-flex items-center gap-1 text-xs font-semibold text-primary underline underline-offset-4 hover:cursor-pointer"
+							onClick={(e) => {
+								if (!unitGuideURL) return;
+								e.preventDefault();
+								window.open(unitGuideURL, "_blank", "noopener,noreferrer");
+							}}
+						>
+
+							Open Unit Guide <ExternalLink className="size-3.5" />
+						</div>
+					)}
 				</div>
 				<div className="flex flex-col items-end gap-2">
 					<div className="mt-auto">
