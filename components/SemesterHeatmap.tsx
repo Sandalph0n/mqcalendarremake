@@ -57,8 +57,10 @@ const SemesterCalendar = () => {
   const today = Temporal.Now.zonedDateTimeISO(SYDNEY_TZ);
 
   const periods = [calendar.firstHalf, calendar.recess, calendar.secondHalf, calendar.examPeriod];
-  const start = toSydneyZonedDateTime(planner.milestone?.["study period start"]!);
-  const end = toSydneyZonedDateTime(planner.milestone?.["exams end"]!);
+  const studyStartKey = planner.milestone?.["study period start"];
+  const examsEndKey = planner.milestone?.["exams end"];
+  const start = studyStartKey ? toSydneyZonedDateTime(studyStartKey) : null;
+  const end = examsEndKey ? toSydneyZonedDateTime(examsEndKey) : null;
 
   const periodOverlay: { color: string; start: number; end: number }[] = [];
   let todayPercent: number | null = null;

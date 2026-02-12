@@ -14,6 +14,8 @@ import { Separator } from "@/components/ui/separator";
 // } from "@/components/ui/collapsible"
 
 import { Label } from "./ui/label";
+import { DialogTitle } from "@radix-ui/react-dialog";
+import { VisuallyHidden } from "radix-ui";
 
 type RGB = [number, number, number];
 
@@ -55,6 +57,11 @@ const CalendarSetting = ({ openSetting, setOpenSetting }: {
   return (
     <div>
       <Dialog open={openSetting} onOpenChange={setOpenSetting}>
+
+        <VisuallyHidden.Root>
+          <DialogTitle>Calendar Settings Dialog Box</DialogTitle>
+        </VisuallyHidden.Root >
+        
         <DialogContent
           className={cn(
             "fixed p-0 max-w-3xl w-full border-none bg-transparent shadow-none sm:max-w-3xl sm:max-h-5xl max-h-[70%] h-full",

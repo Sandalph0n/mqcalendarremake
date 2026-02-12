@@ -5,8 +5,8 @@ const SiteFooter = () => {
     { label: "About", href: "/about" },
     { label: "Privacy Policy", href: "#" },
     { label: "Terms of Service", href: "#" },
-    { label: "Contact", href: "#" },
-    { label: "Document", href: "#" },
+    { label: "Contact", href: "/contact" },
+    { label: "Document", href: "/doc" },
   ];
 
   return (

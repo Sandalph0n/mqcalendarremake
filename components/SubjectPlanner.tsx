@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { BookA, ChevronDown } from "lucide-react";
+import { BookA } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
 import { usePlanner } from '@/contexts/PlannerContext';
@@ -8,7 +8,7 @@ import SubjectCard from './SubjectCard';
 import Link from 'next/link';
 import { nanoid } from 'nanoid';
 const SubjectPlanner = () => {
-	const {planner, setPlanner } = usePlanner();
+	const { planner, setPlanner } = usePlanner();
 
 	const [isFetch, setIsFetch] = useState<boolean>(false);
 	const [unitCodeInput, setUnitCodeInput] = useState<string>("");
@@ -16,14 +16,14 @@ const SubjectPlanner = () => {
 
 
 	async function handleFetch() {
-            		// setPlanner((prev) => ({...prev, subjects: []}))
+		// setPlanner((prev) => ({...prev, subjects: []}))
 		// console.log(planner) 
 		// return
 		if (!unitCodeInput) { // check if user entered unit
 			setError("Please enter Unit Code to fetch")
 			return;
 		}
-		for (let s of planner.subjects) { // check if the unit is added
+		for (const s of planner.subjects) { // check if the unit is added
 			// console.log(s)
 			if (s.unitCode?.toLowerCase() == unitCodeInput.toLowerCase()) {
 				setError(`${unitCodeInput} is already added to the plan`)
@@ -47,17 +47,17 @@ const SubjectPlanner = () => {
 			});
 
 			if (!res.ok) {
-				if (res.status == 404){
+				if (res.status == 404) {
 					throw new Error(`Cannot find subject ${unitCodeInput} for period ${planner.year} session ${planner.session}. Please check unit guide and try again.`);
 				}
-				else{
+				else {
 					throw new Error(`Internal server error. Please contact us to report the error!`);
 				}
 			}
 
 			const data = await res.json() as { subject: SubjectProps };
 			const dataWithID = {
-				subject: {...data.subject, id: nanoid()}
+				subject: { ...data.subject, id: nanoid() }
 			}
 			setPlanner(prev => {
 				const subjects = prev?.subjects ?? [];
@@ -81,14 +81,14 @@ const SubjectPlanner = () => {
 	function handleChangeUnit(event: React.ChangeEvent<HTMLInputElement>) {
 		setUnitCodeInput(event.target.value)
 	}
-	
-	
+
+
 
 
 
 	return (
 		<Card className="w-full border-none shadow-lg bg-linear-to-br from-background via-background/70 to-[#2f302f]/20 rounded-2xl">
-			
+
 			<CardHeader className="flex flex-col gap-2">
 				<div className="flex items-center gap-3">
 					<div className="h-11 w-11 rounded-xl bg-secondary text-secondary-foreground flex items-center justify-center shadow-md">
@@ -100,13 +100,12 @@ const SubjectPlanner = () => {
 					</div>
 				</div>
 			</CardHeader>
-			<CardContent>
+			<CardContent className='flex flex-col gap-2'>
 				<div className="flex flex-col gap-3 sm:flex-row sm:items-center">
 					<input
 						type="text"
 						placeholder="Enter Unit Code, e.g. COMP1000"
 						className="w-full rounded-md border px-3 py-2 bg-white/80 dark:bg-secondary/80 dark:text-white/80"
-						
 						// className="w-full rounded-md border px-3 py-2 bg-secondary-foreground/80 dark:text-white/80"
 						value={unitCodeInput}
 						onChange={handleChangeUnit}
@@ -125,14 +124,22 @@ const SubjectPlanner = () => {
 						{!isFetch ? "Fetch" : "Fetching"}
 					</Button>
 				</div>
-				<div className='flex items-center gap-3 h-6 mt-6 w-full justify-center'>
-					{error && <p className='text-destructive text-sm'>{error}</p>}
-					{(!planner?.subjects || planner.subjects.length === 0) && !error ?
-						<CardDescription >Please add some subject to start building your calendar</CardDescription>
-						:
-						<div></div>
-					}
-				</div>
+				{error ? (
+					<div className="my-1 w-full rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3">
+						<p className="text-sm font-semibold text-destructive">{error}</p>
+						<p className="mt-1 text-xs text-destructive/90">
+							If you believe it&apos;s an error, please{" "}
+							<Link href="/contact" className="underline underline-offset-2">
+								report it
+							</Link>
+							.
+						</p>
+					</div>
+				) : (!planner?.subjects || planner.subjects.length === 0) ? (
+					<div className="mt-6 flex w-full justify-center">
+						<CardDescription>Please add some subject to start building your calendar</CardDescription>
+					</div>
+				) : null}
 				<div className='flex items-center justify-center gap-3 flex-col w-full'>
 					{planner?.subjects && planner.subjects.length > 0 && (
 						planner.subjects.map(

@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { cn } from '@/lib/utils'
-import { SessionCalendarProps, SubjectProps, usePlanner } from '@/contexts/PlannerContext'
+import { SessionCalendarProps, usePlanner } from '@/contexts/PlannerContext'
 import { addDaysLocal, addTimes, plainDateToZonedMidnight, toSydneyPlainDate, toSydneyZonedDateTime, SYDNEY_TZ } from '@/lib/timeUtils';
 import { Temporal } from "temporal-polyfill";
 import { ExternalLink } from "lucide-react";
@@ -45,7 +45,7 @@ const SubjectCalendar = () => {
 		}));
 
 		setPlanner(prev => ({ ...prev, subjects }));
-	}, [planner.subjects]);
+	}, [planner.subjects, setPlanner]);
 	const subjects = planner.subjects ?? [];
 	const calendar = planner.calendar as SessionCalendarProps;
 	const weeks = planner.calendar?.week ?? {};
@@ -76,8 +76,8 @@ const SubjectCalendar = () => {
 	};
 
 	const periods = [calendar.firstHalf, calendar.recess, calendar.secondHalf, calendar.examPeriod];
-	const start = toSydneyZonedDateTime(planner.milestone?.['study period start']!);
-	const end = toSydneyZonedDateTime(planner.milestone?.['exams end']!);
+	const start = toSydneyZonedDateTime(planner.milestone!['study period start']!);
+	const end = toSydneyZonedDateTime(planner.milestone!['exams end']!);
 
 	const periodOverlay: {
 		color: string;
@@ -184,7 +184,7 @@ const SubjectCalendar = () => {
 							style={{ left: `${subjectColWidth}`, right: 0, top: 0, bottom: 0 }}
 						>
 							<div
-								className="absolute top-0 bottom-0 w-[2px] bg-primary/70"
+								className="absolute top-0 bottom-0 w-0.5 bg-primary/70"
 								style={{ left: `${todayPercent}%` }}
 							/>
 						</div>
@@ -200,7 +200,7 @@ const SubjectCalendar = () => {
 							No weeks available
 						</div>
 					) : (
-						weekEntries.map((w, idx) => (
+						weekEntries.map((w) => (
 							<div
 								key={`wk-header-${w.number}`}
 								className={cn(

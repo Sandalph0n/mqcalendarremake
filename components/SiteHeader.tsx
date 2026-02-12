@@ -41,7 +41,20 @@ const navigation: INavigation[] = [
 	{ name: "Home", href: "/" },
 	{ name: "Subject Planner", href: "/subject-planner" },
 	{ name: "Calendar", href: "/calendar" },
-	{ name: "About", href: "/about"},
+	{ name: "About", href: "",
+		childen: [
+			{
+				name: "Our Contributors",
+				description: "The people behind the product, passionate about what they do.",
+				href: "/about"
+			},
+			{
+				name: "Contact Us",
+				description: "Any improvement ideas or bug reports, please let us know!",
+				href: "/contact"
+			}
+		]
+	},
 	{
 		name: "Guide", href: "",
 		childen: [
@@ -216,15 +229,14 @@ const SiteHeader = () => {
 
 								if (!item.childen) { // no children
 									return (
-										<NavigationMenuItem>
+										<NavigationMenuItem key={item.href ?? item.name + "full"}>
 											<CustomNavigationMenuLink
 												asChild
 												className={cn(customNavigationMenuTriggerStyle(), // this function is edited to achieve custom style  
 													"text-md font-semibold leading-6 transition-colors",
 													pathName === item.href ? "text-primary" : "text-foreground")}
-												key={item.href + "menulink"}
 											>
-												<Link key={item.href + "link"} href={item.href}>{item.name}</Link>
+												<Link href={item.href}>{item.name}</Link>
 											</CustomNavigationMenuLink>
 										</NavigationMenuItem>
 									)
@@ -233,7 +245,7 @@ const SiteHeader = () => {
 								else { // has children
 									// return null
 									return (
-										<NavigationMenuItem className='left-0.5'>
+										<NavigationMenuItem key={item.href ?? item.name + "group"} className='left-0.5'>
 											<CustomNavigationMenuTrigger
 												className={cn(
 													"text-md font-semibold leading-6 transition-colors ",

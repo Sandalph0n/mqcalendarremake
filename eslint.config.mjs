@@ -12,7 +12,17 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Legacy app (not part of Next.js codebase):
+    "legacy/**",
+    // Local/generated artifacts:
+    "tsconfig.tsbuildinfo",
   ]),
+  {
+    rules: {
+      // This rule is too strict for common UI state sync patterns.
+      "react-hooks/set-state-in-effect": "off",
+    },
+  },
 ]);
 
 export default eslintConfig;
