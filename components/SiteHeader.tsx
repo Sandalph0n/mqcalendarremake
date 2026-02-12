@@ -229,7 +229,7 @@ const SiteHeader = () => {
 
 								if (!item.childen) { // no children
 									return (
-										<NavigationMenuItem key={item.href ?? item.name + "full"}>
+										<NavigationMenuItem key={item.href || item.name + "full"}>
 											<CustomNavigationMenuLink
 												asChild
 												className={cn(customNavigationMenuTriggerStyle(), // this function is edited to achieve custom style  
@@ -245,7 +245,7 @@ const SiteHeader = () => {
 								else { // has children
 									// return null
 									return (
-										<NavigationMenuItem key={item.href ?? item.name + "group"} className='left-0.5'>
+										<NavigationMenuItem key={item.href || item.name + "group"} className='left-0.5'>
 											<CustomNavigationMenuTrigger
 												className={cn(
 													"text-md font-semibold leading-6 transition-colors ",
