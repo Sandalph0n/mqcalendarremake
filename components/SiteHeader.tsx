@@ -92,10 +92,18 @@ const MobileNavigation = [
 
 const SiteHeader = () => {
 	const pathName = usePathname()
-	const { theme, resolvedTheme } = useTheme();
+	// const { theme, resolvedTheme } = useTheme();
 	const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-	const current = resolvedTheme || theme; // handles 'system'
-	const logo = current === "dark" ? DarkLogo : LightLogo;
+	// const current = resolvedTheme || theme; // handles 'system'
+	// console.log("resolvedTheme: ", resolvedTheme)
+	// console.log("theme: ", theme)
+
+	// const logo = current === "dark" ? DarkLogo : LightLogo;
+	// console.log(current === "dark");
+	// console.log("Dark logo: ", logo === DarkLogo)
+	// console.log("Light logo: ", logo === LightLogo)
+	// console.log()
+
 
 	// useEffect(()=>{
 	// 	console.log("theme: ", theme);
@@ -115,9 +123,15 @@ const SiteHeader = () => {
 					<Link href="/">
 						<div className='flex items-center'>
 							<Image
-								src={logo}
+								src={LightLogo}
 								alt="Macquarie logo"
-								className='w-auto h-15 my-3'
+								className='w-auto h-15 my-3 block dark:hidden'
+								loading='eager'
+							/>
+							<Image
+								src={DarkLogo}
+								alt="Macquarie logo"
+								className='w-auto h-15 my-3 hidden dark:block'
 								loading='eager'
 							/>
 							{/* <span className='text-xl font-bold'>AssessmentPlanner</span> */}
