@@ -2,13 +2,14 @@
 
 import React, { useMemo, useState } from "react";
 import { usePlanner } from "@/contexts/PlannerContext";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardAction } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { X, Check, Calendar, Hash, Ghost } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Temporal } from "temporal-polyfill";
 import { SYDNEY_TZ, toSydneyPlainDate } from "@/lib/timeUtils";
+import { VisuallyHidden } from "radix-ui";
 
 
 const DAY_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -148,6 +149,10 @@ const PeriodCalendarPopup = ({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
+            <VisuallyHidden.Root>
+                <DialogHeader>Calendar Popup Box</DialogHeader>
+            </VisuallyHidden.Root>
+
             <DialogContent className="fixed p-0 max-w-2xl w-full border-none bg-transparent shadow-none sm:max-w-2xl max-h-[90vh] h-auto" showCloseButton={false}>
                 <Card className="w-full max-h-[90vh] flex flex-col border-none shadow-2xl">
                     <CardHeader className="shrink-0 pb-0">
@@ -246,7 +251,7 @@ const PeriodCalendarPopup = ({
                                             >
                                                 <div
                                                     className={cn(
-                                                        "inline-flex items-center gap-1.5 size-9  px-2 py-1.5 rounded-md transition-colors",
+                                                        "inline-flex items-center gap-1.5 px-2 py-1.5 rounded-md transition-colors",
                                                         selectedWeek === row.weekNumber
                                                             ? "text-primary"
                                                             : rowHovering && !dayHovering

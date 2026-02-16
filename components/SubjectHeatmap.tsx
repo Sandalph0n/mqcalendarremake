@@ -4,6 +4,7 @@ import { SessionCalendarProps, usePlanner } from '@/contexts/PlannerContext'
 import { addDaysLocal, addTimes, plainDateToZonedMidnight, toSydneyPlainDate, toSydneyZonedDateTime, SYDNEY_TZ } from '@/lib/timeUtils';
 import { Temporal } from "temporal-polyfill";
 import { ExternalLink } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
 
 export const SUBJECT_PALETTE: Array<[number, number, number]> = [
 	[59, 130, 246],   // blue
@@ -180,44 +181,45 @@ const SubjectCalendar = () => {
 	return (
 		<div className="w-full  bg-card text-card-foreground shadow-lg overflow-hidden ">
 			<div className="overflow-x-auto">
-				<div
-					className="grid relative  "
-					style={{
-						gridTemplateRows,
-						gridTemplateColumns: gridTemplateCols,
-						minWidth: `${160 + weekEntries.length * 60}px`,
-					}}
-				>
-					{/* Overlay for periods/current-day */}
+				<TooltipProvider>
 					<div
-						className="absolute inset-0 pointer-events-none "
-						style={{ left: `${subjectColWidth}`, right: 0, top: 0, height: headerHeight }}
+						className="grid relative  "
+						style={{
+							gridTemplateRows,
+							gridTemplateColumns: gridTemplateCols,
+							minWidth: `${160 + weekEntries.length * 60}px`,
+						}}
 					>
-						{periodOverlay.map((overlay) => (
-							<div
-								key={overlay.color + overlay.start}
-								className={cn("absolute", `${overlay.color}`)}
-								style={{
-									width: `${overlay.end - overlay.start}%`,
-									left: `${overlay.start}%`,
-									top: 0,
-									bottom: 0,
-								}}
-							/>
-						))}
-
-					</div>
-					{todayPercent !== null && (
+						{/* Overlay for periods/current-day */}
 						<div
-							className="absolute pointer-events-none"
-							style={{ left: `${subjectColWidth}`, right: 0, top: 0, bottom: 0 }}
+							className="absolute inset-0 pointer-events-none "
+							style={{ left: `${subjectColWidth}`, right: 0, top: 0, height: headerHeight }}
 						>
-							<div
-								className="absolute top-0 bottom-0 w-0.5 bg-primary/70"
-								style={{ left: `${todayPercent}%` }}
-							/>
+							{periodOverlay.map((overlay) => (
+								<div
+									key={overlay.color + overlay.start}
+									className={cn("absolute", `${overlay.color}`)}
+									style={{
+										width: `${overlay.end - overlay.start}%`,
+										left: `${overlay.start}%`,
+										top: 0,
+										bottom: 0,
+									}}
+								/>
+							))}
+
 						</div>
-					)}
+						{todayPercent !== null && (
+							<div
+								className="absolute pointer-events-none"
+								style={{ left: `${subjectColWidth}`, right: 0, top: 0, bottom: 0 }}
+							>
+								<div
+									className="absolute top-0 bottom-0 w-0.5 bg-primary/70"
+									style={{ left: `${todayPercent}%` }}
+								/>
+							</div>
+						)}
 					{/* Top-left header (sticky) */}
 					<div className="flex items-center justify-center font-semibold text-sm bg-muted sticky left-0 z-10">
 						Subject
@@ -261,30 +263,46 @@ const SubjectCalendar = () => {
 
 					{/* Content cells placeholder */}
 					{subjects.map((subject, rowIdx) =>
-						weekEntries.map((w, colIdx) => (
-							<div
-								key={`cell-${rowIdx}-${w.number}`}
-								className="relative flex items-center justify-center text-xs text-muted-foreground bg-background/60 group" tabIndex={0}
-								style={{
-									gridRowStart: rowIdx + 2,
-									gridColumnStart: colIdx + 2,
-									backgroundColor: weightToBg(
-										cellMatrix[rowIdx]?.[colIdx]?.weight,
-										subject.displayColor ?? SUBJECT_PALETTE[rowIdx % SUBJECT_PALETTE.length]
-									),
-								}}
-							>
-								{cellMatrix[rowIdx]?.[colIdx]?.weight
-									? cellMatrix[rowIdx][colIdx].weight.toFixed(1)
-									: "—"}
-								{cellMatrix[rowIdx]?.[colIdx]?.assessments.length ? (
-									<div
-										className="absolute z-50 hidden w-64 max-w-[16rem] -translate-x-1/2 -translate-y-2 whitespace-normal rounded-md border border-border bg-card p-3 text-foreground shadow-lg group-hover:block group-focus-within:block"
-										style={{ left: "50%", top: 0 }}
+						weekEntries.map((w, colIdx) => {
+							const cell = cellMatrix[rowIdx]?.[colIdx];
+							const hasAssessments = Boolean(cell?.assessments.length);
+							const cellContent = (
+								<div
+									className="relative flex items-center justify-center text-xs text-muted-foreground bg-background/60 focus:outline-none focus:ring-2 focus:ring-primary/40" 
+									tabIndex={0}
+									style={{
+										gridRowStart: rowIdx + 2,
+										gridColumnStart: colIdx + 2,
+										backgroundColor: weightToBg(
+											cell?.weight,
+											subject.displayColor ?? SUBJECT_PALETTE[rowIdx % SUBJECT_PALETTE.length]
+										),
+									}}
+								>
+									{cell?.weight ? cell.weight.toFixed(1) : "—"}
+								</div>
+							);
+
+							if (!hasAssessments) return (
+								React.cloneElement(cellContent, { key: `cell-${rowIdx}-${w.number}` })
+							);
+
+							return (
+								<Tooltip key={`cell-${rowIdx}-${w.number}`} delayDuration={0}>
+									<TooltipTrigger asChild>
+										{cellContent}
+									</TooltipTrigger>
+									<TooltipContent
+										side="top"
+										align="center"
+										sideOffset={6}
+										className="w-64 max-w-[16rem] bg-card text-foreground border border-border shadow-lg"
+										// arrowClassName="fill-[hsl(var(--card))] stroke-[hsl(var(--card))]"
+										arrowClassName='bg-background fill-background'
 									>
 										<div className="text-xs font-semibold mb-1">Assessments</div>
 										<div className="space-y-2">
-											{cellMatrix[rowIdx][colIdx].assessments.map((asm, idx) => (
+											{cell.assessments.map((asm, idx) => (
 												<div key={`${rowIdx}-${colIdx}-${idx}`} className="text-xs">
 													<div className="font-semibold">{asm.name || "Untitled"}</div>
 													<div className="text-muted-foreground">
@@ -307,12 +325,13 @@ const SubjectCalendar = () => {
 												</div>
 											))}
 										</div>
-									</div>
-								) : null}
-							</div>
-						))
+									</TooltipContent>
+								</Tooltip>
+							);
+						})
 					)}
 				</div>
+				</TooltipProvider>
 			</div>
 		</div>
 	);

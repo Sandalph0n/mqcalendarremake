@@ -4,6 +4,7 @@ import { SessionCalendarProps, SubjectProps, usePlanner } from "@/contexts/Plann
 import { addDaysLocal, addTimes, plainDateToZonedMidnight, toSydneyPlainDate, toSydneyZonedDateTime, SYDNEY_TZ } from "@/lib/timeUtils";
 import { ExternalLink } from "lucide-react";
 import { Temporal } from "temporal-polyfill";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
 
 type CellData = {
   weight: number;
@@ -47,7 +48,7 @@ const SemesterCalendar = () => {
     .filter(Boolean)
     .sort((a, b) => a!.number - b!.number) as { number: number; label: string }[];
 
-  
+
   const headerHeight = "2.75rem";
   const rowHeight = "3rem";
   const subjectColWidth = "7rem";
@@ -133,13 +134,13 @@ const SemesterCalendar = () => {
     }
   });
 
-    for (let i = 0; i < cellMatrix[overallIdx].length; i++){ // column iteration
-      let totalPerW = 0;
-      for (let j = 0; j < subjects.length-1; j ++ ){// row iteration
-        totalPerW += cellMatrix[j][i].weight;
-      } 
-      cellMatrix[overallIdx][i].weight = totalPerW;
+  for (let i = 0; i < cellMatrix[overallIdx].length; i++) { // column iteration
+    let totalPerW = 0;
+    for (let j = 0; j < subjects.length - 1; j++) {// row iteration
+      totalPerW += cellMatrix[j][i].weight;
     }
+    cellMatrix[overallIdx][i].weight = totalPerW;
+  }
 
 
   // Total weight per week across all subjects (for column-wide colouring)
@@ -157,140 +158,163 @@ const SemesterCalendar = () => {
   return (
     <div className="w-full bg-card text-card-foreground shadow-lg overflow-hidden">
       <div className="overflow-x-auto">
-        <div
-          className="grid relative"
-          style={{
-            gridTemplateRows,
-            gridTemplateColumns: gridTemplateCols,
-            minWidth: `${160 + weekEntries.length * 60}px`,
-          }}
-        >
-          {/* Period overlay (header only) */}
+        <TooltipProvider>
           <div
-            className="absolute pointer-events-none"
-            style={{ left: `${subjectColWidth}`, right: 0, top: 0, height: headerHeight }}
+            className="grid relative"
+            style={{
+              gridTemplateRows,
+              gridTemplateColumns: gridTemplateCols,
+              minWidth: `${160 + weekEntries.length * 60}px`,
+            }}
           >
-            {periodOverlay.map((overlay) => (
-              <div
-                key={overlay.color + overlay.start}
-                className={cn("absolute", `${overlay.color}`)}
-                style={{
-                  width: `${overlay.end - overlay.start}%`,
-                  left: `${overlay.start}%`,
-                  top: 0,
-                  bottom: 0,
-                }}
-              />
-            ))}
-          </div>
-          {/* Current day line (full height) */}
-          {todayPercent !== null && (
+            {/* Period overlay (header only) */}
             <div
               className="absolute pointer-events-none"
-              style={{ left: `${subjectColWidth}`, right: 0, top: 0, bottom: 0 }}
+              style={{ left: `${subjectColWidth}`, right: 0, top: 0, height: headerHeight }}
             >
-              <div
-                className="absolute top-0 bottom-0 w-[2px] bg-primary/70"
-                style={{ left: `${todayPercent}%` }}
-              />
+              {periodOverlay.map((overlay) => (
+                <div
+                  key={overlay.color + overlay.start}
+                  className={cn("absolute", `${overlay.color}`)}
+                  style={{
+                    width: `${overlay.end - overlay.start}%`,
+                    left: `${overlay.start}%`,
+                    top: 0,
+                    bottom: 0,
+                  }}
+                />
+              ))}
             </div>
-          )}
-
-          {/* Top-left header (sticky) */}
-          <div className="flex items-center justify-center font-semibold text-sm bg-muted sticky left-0 z-10">
-            Subject
-          </div>
-
-          {/* Week headers */}
-          {weekEntries.length === 0 ? (
-            <div className="flex items-center px-3 text-sm text-muted-foreground bg-muted/40">
-              No weeks available
-            </div>
-          ) : (
-            weekEntries.map((w) => (
+            {/* Current day line (full height) */}
+            {todayPercent !== null && (
               <div
-                key={`wk-header-${w.number}`}
-                className="flex items-center p-3 justify-center text-xs font-semibold uppercase tracking-wide bg-muted/40 border-x"
+                className="absolute pointer-events-none"
+                style={{ left: `${subjectColWidth}`, right: 0, top: 0, bottom: 0 }}
               >
-                {w.label}
+                <div
+                  className="absolute top-0 bottom-0 w-[2px] bg-primary/70"
+                  style={{ left: `${todayPercent}%` }}
+                />
               </div>
-            ))
-          )}
+            )}
 
-          {/* Subject column */}
-          {subjects.length === 0 ? (
-            <div className="col-start-1 row-start-2 flex items-center px-3 text-sm text-muted-foreground bg-card">
-              No subjects
+            {/* Top-left header (sticky) */}
+            <div className="flex items-center justify-center font-semibold text-sm bg-muted sticky left-0 z-10">
+              Subject
             </div>
-          ) : (
-            subjects.map((subject, idx) => (
-              <div
-                key={`subj-${subject.unitCode || idx}`}
-                className={cn("flex items-center px-3 text-sm bg-card sticky left-0 z-10",
-                  idx == subjects.length -1 ? "border-t border-gray-600/40" : ""
-                )}
-                style={{ gridRowStart: idx + 2 }}
-              >
-                {subject.unitCode || subject.unitName || `Subject ${idx + 1}`}
+
+            {/* Week headers */}
+            {weekEntries.length === 0 ? (
+              <div className="flex items-center px-3 text-sm text-muted-foreground bg-muted/40">
+                No weeks available
               </div>
-            ))
-          )}
+            ) : (
+              weekEntries.map((w) => (
+                <div
+                  key={`wk-header-${w.number}`}
+                  className="flex items-center p-3 justify-center text-xs font-semibold uppercase tracking-wide bg-muted/40 border-x"
+                >
+                  {w.label}
+                </div>
+              ))
+            )}
 
-          {/* Content cells */}
-          {subjects.map((subject, rowIdx) =>
-            weekEntries.map((w, colIdx) => (
-              <div
-                key={`cell-${rowIdx}-${w.number}`}
-                className={cn("relative flex items-center justify-center text-xs bg-background/60 group",
-                  rowIdx == subjects.length -1 ? "border-t border-gray-600/40" : "",
-                  cellMatrix[rowIdx]?.[colIdx]?.weight ?" text-gray-100 ": "text-muted-foreground"
-                )}
-                style={{
-                  gridRowStart: rowIdx + 2,
-                  gridColumnStart: colIdx + 2,
-                  // Colour entire column based on total weekly load (even if this subject has none)
-                  // textShadow: !cellMatrix[rowIdx]?.[colIdx]?.weight ? "0 1px 2px rgba(0, 0, 0, 0.35)" : "none",
-                  textShadow: cellMatrix[rowIdx]?.[colIdx]?.weight ? "0 1px 2px rgba(0, 0, 0, 0.35)" : "none",
+            {/* Subject column */}
+            {subjects.length === 0 ? (
+              <div className="col-start-1 row-start-2 flex items-center px-3 text-sm text-muted-foreground bg-card">
+                No subjects
+              </div>
+            ) : (
+              subjects.map((subject, idx) => (
+                <div
+                  key={`subj-${subject.unitCode || idx}`}
+                  className={cn("flex items-center px-3 text-sm bg-card sticky left-0 z-10",
+                    idx == subjects.length - 1 ? "border-t border-gray-600/40" : ""
+                  )}
+                  style={{ gridRowStart: idx + 2 }}
+                >
+                  {subject.unitCode || subject.unitName || `Subject ${idx + 1}`}
+                </div>
+              ))
+            )}
 
-                  backgroundColor: columnWeightToBg(columnWeights[colIdx], rowIdx != subjects.length-1 ? PRIMARY_BASE: SECONDARY_BASE),
-                }}
-              >
-                {cellMatrix[rowIdx]?.[colIdx]?.weight
-                  ? cellMatrix[rowIdx][colIdx].weight.toFixed(1)
-                  : "—"}
-                {cellMatrix[rowIdx]?.[colIdx]?.assessments.length ? (
-                  <div className="absolute z-50 hidden w-72 max-w-[18rem] -translate-x-1/2 -translate-y-2 whitespace-normal rounded-md border border-border bg-card p-3 text-foreground shadow-lg group-hover:block">
-                    <div className="text-xs font-semibold mb-1">Assessments</div>
-                    <div className="space-y-2">
-                      {cellMatrix[rowIdx][colIdx].assessments.map((asm, idx) => (
-                        <div key={`c-${rowIdx}-${colIdx}-${idx}`} className="text-xs">
-                          <div className="font-semibold">{subject.unitCode ? `${subject.unitCode}: ` : ""}{asm.name || "Untitled"}</div>
-                          <div className="text-muted-foreground">
-                            Weight: {asm.weighting ?? 0}% | Hurdle: {asm.isHurdle ? "Yes" : "No"}
-                          </div>
-                          {asm.dueText && (
-                            <div className="text-muted-foreground">Due: {asm.dueText}</div>
-                          )}
-                          {asm.anchor && asm.unitGuideURL && (
-                            <a
-                              className="mt-2 inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline"
-                              href={`${asm.unitGuideURL}#${asm.anchor}`}
-                              target="_blank"
-                              rel="noreferrer"
-                            >
-                              View in Unit Guide
-                              <ExternalLink className="size-3.5" />
-                            </a>
-                          )}
-                        </div>
-                      ))}
-                    </div>
+            {/* Content cells */}
+            {subjects.map((subject, rowIdx) =>
+              weekEntries.map((w, colIdx) => {
+                const cell = cellMatrix[rowIdx]?.[colIdx];
+                const hasAssessments = Boolean(cell?.assessments.length);
+
+                const cellContent = (
+                  <div
+                    className={cn(
+                      "relative flex items-center justify-center text-xs bg-background/60 focus:outline-none focus:ring-2 focus:ring-primary/40",
+                      rowIdx == subjects.length - 1 ? "border-t border-gray-600/40" : "",
+                      cell?.weight ? " text-gray-100 " : "text-muted-foreground"
+                    )}
+                    tabIndex={0}
+                    style={{
+                      gridRowStart: rowIdx + 2,
+                      gridColumnStart: colIdx + 2,
+                      textShadow: cell?.weight ? "0 1px 2px rgba(0, 0, 0, 0.35)" : "none",
+                      backgroundColor: columnWeightToBg(
+                        columnWeights[colIdx],
+                        rowIdx != subjects.length - 1 ? PRIMARY_BASE : SECONDARY_BASE
+                      ),
+                    }}
+                  >
+                    {cell?.weight ? cell.weight.toFixed(1) : "—"}
                   </div>
-                ) : null}
-              </div>
-            ))
-          )}
-        </div>
+                );
+
+                if (!hasAssessments) {
+                  return React.cloneElement(cellContent, { key: `cell-${rowIdx}-${w.number}` });
+                }
+
+                return (
+                  <Tooltip key={`cell-${rowIdx}-${w.number}`} delayDuration={0}>
+                    <TooltipTrigger asChild>{cellContent}</TooltipTrigger>
+                    <TooltipContent
+                      side="top"
+                      align="center"
+                      sideOffset={6}
+                      className="w-72 max-w-[18rem] bg-card text-foreground border border-border shadow-lg"
+                      // arrowClassName="fill-[hsl(var(--card))] stroke-[hsl(var(--card))]"
+                      arrowClassName='bg-background fill-background'
+
+                    >
+                      <div className="text-xs font-semibold mb-1">Assessments</div>
+                      <div className="space-y-2">
+                        {cell.assessments.map((asm, idx) => (
+                          <div key={`c-${rowIdx}-${colIdx}-${idx}`} className="text-xs">
+                            <div className="font-semibold">
+                              {subject.unitCode ? `${subject.unitCode}: ` : ""}
+                              {asm.name || "Untitled"}
+                            </div>
+                            <div className="text-muted-foreground">
+                              Weight: {asm.weighting ?? 0}% | Hurdle: {asm.isHurdle ? "Yes" : "No"}
+                            </div>
+                            {asm.dueText && <div className="text-muted-foreground">Due: {asm.dueText}</div>}
+                            {asm.anchor && asm.unitGuideURL && (
+                              <a
+                                className="mt-2 inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline"
+                                href={`${asm.unitGuideURL}#${asm.anchor}`}
+                                target="_blank"
+                                rel="noreferrer"
+                              >
+                                View in Unit Guide
+                                <ExternalLink className="size-3.5" />
+                              </a>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </TooltipContent>
+                  </Tooltip>
+                );
+              })
+            )}
+          </div>
+        </TooltipProvider>
       </div>
     </div>
   );
