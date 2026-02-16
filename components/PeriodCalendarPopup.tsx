@@ -5,10 +5,11 @@ import { usePlanner } from "@/contexts/PlannerContext";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardAction } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-    import { X, Check, Calendar, Hash } from "lucide-react";
+import { X, Check, Calendar, Hash, Ghost } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Temporal } from "temporal-polyfill";
 import { SYDNEY_TZ, toSydneyPlainDate } from "@/lib/timeUtils";
+
 
 const DAY_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const MONTH_NAMES = [
@@ -134,10 +135,15 @@ const PeriodCalendarPopup = ({
 
     // Hover preview label
     const hoverLabel = useMemo(() => {
-        if (!hoverInfo) return null;
-        if (hoverInfo.type === "week") return hoverInfo.label;
+        if (!hoverInfo) {
+            return null;
+        }
+        if (hoverInfo.type === "week") {
+            console.log(hoverInfo.label)
+            return hoverInfo.label + " - You don't know specific date";
+        }
         const d = Temporal.PlainDate.from(hoverInfo.dateStr);
-        return `${MONTH_NAMES[d.month - 1]} ${d.day}, ${d.year} (${hoverInfo.weekLabel})`;
+        return `${hoverInfo.weekLabel} - ${MONTH_NAMES[d.month - 1]} ${d.day}, ${d.year} `;
     }, [hoverInfo]);
 
     return (
@@ -175,7 +181,7 @@ const PeriodCalendarPopup = ({
 									<span className="text-xs text-muted-foreground">Hover over a week or date to preview</span>
 								)}
 							</div>
-                    	</div>
+                        </div>
 
 
                         <CardAction>
@@ -191,16 +197,20 @@ const PeriodCalendarPopup = ({
                         {weekRows.length === 0 ? (
                             <p className="text-sm text-muted-foreground text-center py-8">No study period loaded.</p>
                         ) : (
-                            <div className="space-y-1" onMouseLeave={() => setHoverInfo(null)}>
+                            <div className="space-y-3 " onMouseLeave={() => setHoverInfo(null)}>
                                 {/* HEADER */}
-                                <div className="grid grid-cols-[5rem_repeat(7,1fr)] gap-0 border-b border-slate-100">
+                                <div className="sticky top-0 z-10 grid grid-cols-[5rem_repeat(7,1fr)] gap-0 border-b border-slate-100 bg-background">
                                     <div className="text-[13px] font-medium text-slate-500 py-3">Week</div>
                                     {DAY_LABELS.map((d) => (
                                         <div key={d} className="text-[13px] font-medium text-slate-500 text-center py-3">{d}</div>
                                     ))}
                                 </div>
 
-                                {weekRows.map((row) => (
+                                {weekRows.map((row) => {
+                                    const rowHovering = hoverInfo?.type === "week" && hoverInfo.label === row.fullLabel;
+                                    const dayHovering = hoverInfo?.type === "date" && hoverInfo.weekLabel === row.fullLabel;
+
+                                    return (
                                     <React.Fragment key={row.weekNumber}>
 										{/* MONTH HEADER */}
                                         {row.monthStart && (
@@ -213,25 +223,41 @@ const PeriodCalendarPopup = ({
 
                                         <div
                                             className={cn(
-                                                "grid grid-cols-[5rem_repeat(7,1fr)] gap-0 items-center group transition-all duration-200",
-                                                selectedWeek === row.weekNumber 
-                                                    ? "bg-red-50/80 rounded-lg ring-1 ring-red-100" 
-                                                    : "hover:bg-slate-50 rounded-lg"
+                                                "grid grid-cols-[5rem_repeat(7,1fr)] items-center group transition-all duration-200 cursor-pointer py-1",
+                                                selectedWeek === row.weekNumber
+                                                    ? "bg-red-50/80 rounded-lg ring-1 ring-red-100"
+                                                    : rowHovering && !dayHovering
+                                                        ? "bg-red-50/60 rounded-lg ring-1 ring-red-100/70"
+                                                        : "hover:bg-slate-50 rounded-lg"
                                             )}
                                             onMouseEnter={() => setHoverInfo({ type: "week", label: row.fullLabel })}
                                             onMouseLeave={() => setHoverInfo(null)}
+                                            onClick={() => handlePickWeek(row.weekNumber)}
+                                            role="button"
+                                            tabIndex={0}
                                         >
                                             {/* WEEK SELECTOR */}
                                             <button
-                                                onClick={() => handlePickWeek(row.weekNumber)}
-                                                className={cn(
-                                                    "flex items-center gap-1.5 px-2 py-1.5 text-[13px] font-bold transition-colors",
-                                                    selectedWeek === row.weekNumber ? "text-red-800" : "text-slate-500 hover:text-slate-900",
-                                                    (row.isRecess || row.isExam || row.isStudy) && "font-semibold"
-                                                )}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handlePickWeek(row.weekNumber);
+                                                }}
+                                                className="flex items-center justify-start text-[13px] font-bold group-hover:cursor-pointer"
                                             >
-                                                {selectedWeek === row.weekNumber && <Check className="size-3.5 stroke-[3px]" />}
-                                                {row.label}
+                                                <div
+                                                    className={cn(
+                                                        "inline-flex items-center gap-1.5 size-9  px-2 py-1.5 rounded-md transition-colors",
+                                                        selectedWeek === row.weekNumber
+                                                            ? "text-primary"
+                                                            : rowHovering && !dayHovering
+                                                                ? "bg-primary text-primary-foreground"
+                                                                : "text-slate-500",
+                                                        (row.isRecess || row.isExam || row.isStudy) && "font-semibold"
+                                                    )}
+                                                >
+                                                    {selectedWeek === row.weekNumber && <Check className="size-3.5 stroke-[3px]" />}
+                                                    {row.label}
+                                                </div>
                                             </button>
 
                                             {/* DAYS */}
@@ -241,9 +267,12 @@ const PeriodCalendarPopup = ({
                                                 const isToday = Temporal.PlainDate.compare(day.date, today) === 0;
 
                                                 return (
-                                                    <button
+                                                    <Button
                                                         key={dIdx}
-                                                        onClick={() => handleDayClick(day.date, row.weekNumber)}
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleDayClick(day.date, row.weekNumber);
+                                                        }}
                                                         onMouseEnter={(e) => {
                                                             e.stopPropagation();
                                                             setHoverInfo({ type: "date", dateStr, weekLabel: row.fullLabel });
@@ -252,20 +281,22 @@ const PeriodCalendarPopup = ({
                                                             e.stopPropagation();
                                                             setHoverInfo({ type: "week", label: row.fullLabel });
                                                         }}
+                                                        variant="ghost"
                                                         className={cn(
                                                             "py-1.5 text-[13px] text-center transition-all cursor-pointer hover:bg-primary hover:text-white rounded-md font-semibold",
                                                             selectedWeek === row.weekNumber ? "text-slate-600" : "text-slate-400",
                                                             isSelectedDate && "bg-primary text-white font-bold rounded-md shadow-sm scale-105",
                                                             isToday && !isSelectedDate && "text-red-600 font-bold underline underline-offset-4"
                                                         )}
+                                                        size={"icon"}
                                                     >
                                                         {day.dayOfMonth}
-                                                    </button>
+                                                    </Button>
                                                 );
                                             })}
                                         </div>
                                     </React.Fragment>
-                                ))}
+                                )})}
                             </div>
                         )}
                     </CardContent>
