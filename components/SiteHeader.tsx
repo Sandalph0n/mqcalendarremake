@@ -105,15 +105,6 @@ const SiteHeader = () => {
 	// console.log()
 
 
-	// useEffect(()=>{
-	// 	console.log("theme: ", theme);
-	// 	console.log("resolvedTheme: ", resolvedTheme);
-	// },[theme, resolvedTheme]);
-
-	// const [mounted, setMounted] = useState(false);
-	// useEffect(() => setMounted(true), []);
-	// if (!mounted) return null; // stop render if not yet mounted, avoid mismatch
-
 
 	return (
 		<header className='sticky top-0 z-50 w-full border-b bg-background/95'>

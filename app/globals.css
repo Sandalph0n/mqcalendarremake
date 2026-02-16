@@ -145,3 +145,13 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Hide the native calendar icon */
+.date-input-no-native-icon::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  display: none;
+}
+.date-input-no-native-icon::-webkit-inner-spin-button,
+.date-input-no-native-icon::-webkit-clear-button {
+  display: none;
+}

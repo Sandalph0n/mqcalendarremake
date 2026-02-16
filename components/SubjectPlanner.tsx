@@ -124,23 +124,15 @@ const SubjectPlanner = () => {
 						{!isFetch ? "Fetch" : "Fetching"}
 					</Button>
 				</div>
-				{error ? (
-					<div className="my-1 w-full rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3">
-						<p className="text-sm font-semibold text-destructive">{error}</p>
-						<p className="mt-1 text-xs text-destructive/90">
-							If you believe it&apos;s an error, please{" "}
-							<Link href="/contact" className="underline underline-offset-2">
-								report it
-							</Link>
-							.
-						</p>
-					</div>
-				) : (!planner?.subjects || planner.subjects.length === 0) ? (
-					<div className="mt-6 flex w-full justify-center">
-						<CardDescription>Please add some subject to start building your calendar</CardDescription>
-					</div>
-				) : null}
-				<div className='flex items-center justify-center gap-3 flex-col w-full'>
+
+				{error && <p className='text-destructive text-sm mt-6 text-center font-bold'>{error}</p>}
+
+				{(!planner?.subjects || planner.subjects.length === 0) && !error ?
+						<CardDescription className='text-center mt-6'>Please add some subject to start building your calendar</CardDescription>
+						:
+						<div></div>
+				}
+				<div className='flex items-center justify-center gap-3 flex-col w-full mt-6'>
 					{planner?.subjects && planner.subjects.length > 0 && (
 						planner.subjects.map(
 							(subject, idx) => (
