@@ -30,71 +30,72 @@ const CalendarPage = () => {
 		<div className="flex flex-col min-h-screen bg-gradient-to-b from-background via-muted/30 to-background px-4 py-10">
 			<div className="mx-auto w-full max-w-7xl space-y-6">
 				<Card className="shadow-lg border-border/80 bg-card/95 backdrop-blur">
-					<CardHeader className="space-y-2">
+					<CardHeader className="space-y-2 px-6 pt-6 pb-3">
 						<CardTitle className="text-3xl font-bold tracking-tight">Calendar & Heatmap</CardTitle>
 						<CardDescription>
 							Consider the workload intensity for each subject or across the entire semester to help you create a specific study plan.
 						</CardDescription>
 					</CardHeader>
-					<CardContent className="space-y-6">
-						{missing.length > 0 ? (
-							<div className="rounded-xl border border-dashed border-primary/50 bg-primary/5 px-4 py-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-								<p className="text-sm text-foreground">{notice}</p>
-								<Button asChild variant="outline" className="border-primary text-primary hover:bg-primary/10">
-									<Link href="/subject-planner">Go to Subject Planner</Link>
-								</Button>
-							</div>
-						) : (
-							<>
-								<Card className="border-border bg-card/90 shadow-sm">
-									<CardHeader className="space-y-1">
+				</Card>
+
+				{missing.length > 0 ? (
+					<Card className="border-dashed border-primary/50 bg-primary/5 px-4 py-3 shadow-sm">
+						<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+							<p className="text-sm text-foreground">{notice}</p>
+							<Button asChild variant="outline" className="border-primary text-primary hover:bg-primary/10">
+								<Link href="/subject-planner">Go to Subject Planner</Link>
+							</Button>
+						</div>
+					</Card>
+				) : (
+					<>
+						<Card className="border-border bg-card/90 shadow-sm">
+							<CardHeader className="space-y-1 px-6 pt-6 pb-3">
+								<div className="flex items-start justify-between gap-4">
+									<div>
 										<CardTitle className="text-xl">Assessment Heatmap</CardTitle>
 										<CardDescription className="text-muted-foreground">
 											Review workload per subject and across the semester.
 										</CardDescription>
-										<CardAction>
+									</div>
+									<CardAction className="mt-1">
+										<Button size="icon" variant="outline"
+											onClick={() => (
+												setOpenSetting((prev) => (!prev))
+											)}
+											aria-label="Open calendar settings"
+										>
+											<Settings size={20} strokeWidth={2} />
+										</Button>
+									</CardAction>
+								</div>
+							</CardHeader>
+							<CardContent className="px-6 pb-6 space-y-8">
+								<section className="space-y-2">
+									<div className="h-px bg-border/70" />
+									<p className="text-xs font-semibold uppercase text-muted-foreground tracking-wide">Subject heatmap</p>
+									<p className="text-xs text-muted-foreground">Workload intensity for each subject.</p>
+									<SubjectCalendar />
+								</section>
 
-											<Button size="icon" variant="outline"
-												onClick={() => (
-													setOpenSetting((prev) => (!prev))
-												)}
-											>
-												<Settings size={56} strokeWidth={2} />
-											</Button>
-										</CardAction>
-									</CardHeader>
-									<CardContent className="p-4">
-										<div className="space-y-10">
-											<section className="space-y-4">
-												<div className="space-y-1">
-													<p className="text-sm font-semibold">Subject heatmap</p>
-													<p className="text-xs text-muted-foreground">Workload intensity for each subject.</p>
-												</div>
-												<SubjectCalendar />
-											</section>
+								<section className="space-y-2">
+									<div className="h-px bg-border/70" />
+									<p className="text-xs font-semibold uppercase text-muted-foreground tracking-wide">Semester heatmap</p>
+									<p className="text-xs text-muted-foreground">Combined workload across the whole semester.</p>
+									<SemesterCalendar />
+								</section>
+							</CardContent>
+							<CardFooter className="px-6 pb-6 pt-0">
+								<CardDescription className="text-destructive ">
+									This calendar mirrors your settings from the <Link href="/subject-planner" className="underline underline-offset-2">Subject Planner</Link>. If anything looks off, adjust it there and refresh here.
+								</CardDescription>
+							</CardFooter>
 
-											<section className="space-y-4">
-												<div className="space-y-1">
-													<p className="text-sm font-semibold">Semester heatmap</p>
-													<p className="text-xs text-muted-foreground">Combined workload across the whole semester.</p>
-												</div>
-												<SemesterCalendar />
-											</section>
-										</div>
-									</CardContent>
-									<CardFooter>
-										<CardDescription className="text-destructive ">
-											This calendar mirrors your settings from the <Link href="/subject-planner" className="underline underline-offset-2">Subject Planner</Link>. If anything looks off, adjust it there and refresh here.
-										</CardDescription>
-									</CardFooter>
+						</Card>
 
-								</Card>
-
-								<SummaryCalendar />
-							</>
-						)}
-					</CardContent>
-				</Card>
+						<SummaryCalendar />
+					</>
+				)}
 			</div>
 			
 			<CalendarSetting openSetting={openSetting} setOpenSetting={setOpenSetting}/>

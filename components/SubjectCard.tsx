@@ -168,10 +168,9 @@ const SubjectCard = ({ subject, index }: Props) => {
 	}
 
 	return (
-		<div className="relative w-full overflow-hidden rounded-2xl border border-border bg-card shadow-lg">
-			<div className="absolute inset-x-0 top-0 h-1 bg-linear-to-r from-primary via-accent to-secondary" />
+		<div className="relative w-full overflow-hidden rounded-xl border border-border/60 bg-muted/20 shadow-none transition-colors hover:border-primary/40">
 			<div className="flex items-start justify-between gap-3 p-5">
-				<div className="flex flex-1 flex-col gap-3 rounded-xl p-1 text-left transition-colors">
+					<div className="flex flex-1 flex-col gap-3 rounded-xl p-1 text-left transition-colors">
 					{/* Code + name */}
 					<div className="flex flex-wrap items-center gap-2">
 						<span className="inline-flex items-center rounded-xl bg-primary/10 px-3 py-1 text-sm font-semibold text-primary">
@@ -199,7 +198,7 @@ const SubjectCard = ({ subject, index }: Props) => {
 							</span>
 						)}
 						{notFinishedAsm === 0 && assessments.length > 0 && (
-							<span className="flex items-center gap-1 rounded-md bg-green-600 px-2 py-1 font-medium text-accent-foreground">
+							<span className="flex items-center gap-1 rounded-md bg-green-800/60 px-2 py-1 font-medium text-accent-foreground">
 								<ClipboardCheck className="size-3.5" />
 								Good to go
 							</span>

@@ -87,7 +87,7 @@ const SubjectPlanner = () => {
 
 
 	return (
-		<Card className="w-full border-none shadow-lg bg-linear-to-br from-background via-background/70 to-[#2f302f]/20 rounded-2xl">
+		<Card className="w-full border border-border/80 shadow-sm bg-card rounded-2xl">
 
 			<CardHeader className="flex flex-col gap-2">
 				<div className="flex items-center gap-3">
