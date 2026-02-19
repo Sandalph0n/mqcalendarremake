@@ -17,7 +17,7 @@ import {
 } from "./ui/card";
 
 import { cn } from "@/lib/utils";
-import { Dialog, DialogContent  } from "./ui/dialog";
+import { Dialog, DialogContent } from "./ui/dialog";
 import { VisuallyHidden } from "radix-ui";
 import { DialogTitle } from "@radix-ui/react-dialog";
 
@@ -171,53 +171,56 @@ const SubjectCard = ({ subject, index }: Props) => {
 		<div className="relative w-full overflow-hidden rounded-xl border border-border bg-card shadow-lg">
 			<div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-primary via-accent to-secondary" />
 			<div className="flex items-start justify-between gap-3 p-5">
-				<div
-					className="flex flex-1 flex-col gap-2 rounded-xl p-1 text-left transition-colors"
-
-				>
-					<div className="flex flex-wrap items-center gap-3">
-						<div className="rounded-xl bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+				<div className="flex flex-1 flex-col gap-3 rounded-xl p-1 text-left transition-colors">
+					{/* Code + name */}
+					<div className="flex flex-wrap items-center gap-2">
+						<span className="inline-flex items-center rounded-xl bg-primary/10 px-3 py-1 text-sm font-semibold text-primary">
 							{code}
-						</div>
+						</span>
+						<p className="text-lg font-semibold text-foreground/90">
+							{realSubject.unitName || "Untitled subject"}
+						</p>
+					</div>
+
+
+					<div className="flex flex-wrap items-center gap-2 text-[11px]">
 						{assessments.length > 0 && (
-							<span className="flex items-center gap-1 rounded-md bg-accent/60 px-2 py-1 text-[11px] font-medium text-accent-foreground">
+							<span className="flex items-center gap-1 rounded-md bg-accent px-2 py-1 font-medium text-accent-foreground">
 								<ClipboardList className="size-3.5" />
 								{assessments.length} assessment
 								{assessments.length > 1 ? "s" : ""}
 							</span>
 						)}
 						{notFinishedAsm > 0 && (
-							<span className="flex items-center gap-1 rounded-md bg-destructive/60 px-2 py-1 text-[11px] font-medium text-accent-foreground">
+							<span className="flex items-center gap-1 rounded-md bg-destructive px-2 py-1 font-medium text-destructive-foreground">
 								<ClipboardList className="size-3.5" />
 								{notFinishedAsm} assessment
 								{notFinishedAsm > 1 ? "s" : ""} not set up
 							</span>
 						)}
-						{notFinishedAsm === 0 && (
-							<span className="flex items-center gap-1 rounded-md bg-green-800/60 px-2 py-1 text-[11px] font-medium text-accent-foreground">
+						{notFinishedAsm === 0 && assessments.length > 0 && (
+							<span className="flex items-center gap-1 rounded-md bg-green-600 px-2 py-1 font-medium text-accent-foreground">
 								<ClipboardCheck className="size-3.5" />
 								Good to go
 							</span>
 						)}
-					</div>
-					<p className="text-sm font-semibold text-foreground/90">
-						{realSubject.unitName || "Untitled subject"}
-					</p>
-
-					
-					{unitGuideURL && (
-						<div className="inline-flex items-center gap-1 text-xs font-semibold text-primary underline underline-offset-4 hover:cursor-pointer"
+						<div
+							className="rounded-md px-2 py-1 inline-flex items-center gap-1 text-xs font-semibold text-primary underline underline-offset-4 hover:cursor-pointer"
 							onClick={(e) => {
 								if (!unitGuideURL) return;
 								e.preventDefault();
 								window.open(unitGuideURL, "_blank", "noopener,noreferrer");
 							}}
 						>
-
 							Open Unit Guide <ExternalLink className="size-3.5" />
 						</div>
-					)}
+					</div>
+
 				</div>
+
+
+
+
 				<div className="flex flex-col items-end gap-2">
 					<div className="mt-auto">
 						{/* Drop down menu */}
@@ -301,36 +304,54 @@ const SubjectCard = ({ subject, index }: Props) => {
 					<Card className="pt-0 w-full max-h-[90vh] ">
 						<div className="flex items-start justify-between gap-3 p-5">
 							<div className="flex flex-1 flex-col gap-2 rounded-xl p-1 text-left transition-colors">
-								<div className="flex flex-wrap items-center gap-3">
-									<div className="rounded-xl bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
-										{code}
+								<div className="flex flex-1 flex-col gap-3 rounded-xl p-1 text-left transition-colors">
+									{/* Code + name */}
+									<div className="flex flex-wrap items-center gap-2">
+										<span className="inline-flex items-center rounded-xl bg-primary/10 px-3 py-1 text-sm font-semibold text-primary">
+											{code}
+										</span>
+										<p className="text-lg font-semibold text-foreground/90">
+											{realSubject.unitName || "Untitled subject"}
+										</p>
 									</div>
-									{editingAssessments.length > 0 && (
-										<span className="flex items-center gap-1 rounded-md bg-accent/60 px-2 py-1 text-[11px] font-medium text-accent-foreground">
-											<ClipboardList className="size-3.5" />
-											{editingAssessments.length} assessment
-											{editingAssessments.length > 1 ? "s" : ""}
-										</span>
-									)}
-									{editingNotFinishedAsm > 0 && (
-										<span className="flex items-center gap-1 rounded-md bg-destructive/60 px-2 py-1 text-[11px] font-medium text-accent-foreground">
-											<ClipboardList className="size-3.5" />
-											{editingNotFinishedAsm} assessment
-											{editingNotFinishedAsm > 1 ? "s" : ""} not set up
-										</span>
-									)}
 
-									{editingNotFinishedAsm === 0 && (
-										<span className="flex items-center gap-1 rounded-md bg-green-800/60 px-2 py-1 text-[11px] font-medium text-accent-foreground">
-											<ClipboardCheck className="size-3.5" />
-											Good to go
-										</span>
-									)}
+
+									<div className="flex flex-wrap items-center gap-2 text-[11px]">
+										{assessments.length > 0 && (
+											<span className="flex items-center gap-1 rounded-md bg-accent px-2 py-1 font-medium text-accent-foreground">
+												<ClipboardList className="size-3.5" />
+												{assessments.length} assessment
+												{assessments.length > 1 ? "s" : ""}
+											</span>
+										)}
+										{notFinishedAsm > 0 && (
+											<span className="flex items-center gap-1 rounded-md bg-destructive px-2 py-1 font-medium text-destructive-foreground">
+												<ClipboardList className="size-3.5" />
+												{notFinishedAsm} assessment
+												{notFinishedAsm > 1 ? "s" : ""} not set up
+											</span>
+										)}
+										{notFinishedAsm === 0 && assessments.length > 0 && (
+											<span className="flex items-center gap-1 rounded-md bg-green-600 px-2 py-1 font-medium text-accent-foreground">
+												<ClipboardCheck className="size-3.5" />
+												Good to go
+											</span>
+										)}
+										<div
+											className="rounded-md px-2 py-1 inline-flex items-center gap-1 text-xs font-semibold text-primary underline underline-offset-4 hover:cursor-pointer"
+											onClick={(e) => {
+												if (!unitGuideURL) return;
+												e.preventDefault();
+												window.open(unitGuideURL, "_blank", "noopener,noreferrer");
+											}}
+										>
+											Open Unit Guide <ExternalLink className="size-3.5" />
+										</div>
+									</div>
 
 								</div>
-								<p className="text-sm font-semibold text-foreground/90">
-									{editingSubject.unitName || "Untitled subject"}
-								</p>
+
+
 
 								<div className="rounded-xl border border-border bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
 									<div className="flex items-start gap-2">
