@@ -146,7 +146,7 @@ const GenericCalendar = () => {
 													</td>
 													<td className="px-4 py-3">
 														{day.eventLabel && day.eventLabel.length > 0 ? (
-															<span className="inline-flex items-center gap-2 rounded-lg px-3 py-1 font-medium ">
+															<span className="inline-flex items-center gap-2 rounded-lg  py-1 font-medium ">
 																{capitalizeWords(day.eventLabel)}
 															</span>
 														) : (
