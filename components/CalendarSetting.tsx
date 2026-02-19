@@ -126,7 +126,7 @@ const CalendarSetting = ({ openSetting, setOpenSetting }: {
                             key={unitCode}
                             className="flex items-center justify-between rounded-md border p-2"
                           >
-                            <div className="flex flex-col">
+                            <div className="flex flex-col ">
                               <div className="text-sm font-medium">{unitCode} – {unitName}</div>
                               {/* <div className="text-xs text-muted-foreground">
                                 Pick a color for this subject
@@ -138,12 +138,12 @@ const CalendarSetting = ({ openSetting, setOpenSetting }: {
                                 <input
                                   type="color"
                                   value={currentHex}
+                                  
                                   onChange={(e) => {
-                                    // console.log(e.target.value)
-
-                                    const rgb = hexToRgb(e.target.value);
                                     console.log(e.target.value)
                                     console.log("hi")
+                                    const rgb = hexToRgb(e.target.value);
+                                    
                                     if (!rgb) return;
 
                                     setPlanner((prev) => ({
@@ -155,15 +155,18 @@ const CalendarSetting = ({ openSetting, setOpenSetting }: {
                                       ),
                                     }));
                                   }}
+                                  // onClick={()=>{
+                                  //   console.log("hi")
+                                  // }}
+
                                   // className="absolute inset-0 h-10 w-10 cursor-pointer border-none p-0 opacity-0"
-                                  className="absolute inset-0 h-10 w-10 cursor-pointer border-none p-0 top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] "
+                                  className="absolute inset-0 h-10 w-10 cursor-pointer border-none p-0 top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] z-10 "
+
+
 
                                   aria-label={`Color for ${unitCode}`}
                                 />
-                                {/* <div
-                                  className="h-full w-full"
-                                  style={{ backgroundColor: currentHex }}
-                                /> */}
+                                
                               </div>
                             </div>
                           </div>

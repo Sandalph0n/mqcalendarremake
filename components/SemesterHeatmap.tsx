@@ -73,11 +73,14 @@ const SemesterCalendar = () => {
       if (!period) continue;
       let color = "";
       if (period === calendar.firstHalf || period === calendar.secondHalf) {
-        color = `bg-green-200/30`;
+        // color = `bg-green-200/30`;
+        color = `bg-secondary/20`;
       } else if (period === calendar.recess) {
-        color = `bg-amber-200/30`;
+        // color = `bg-amber-200/30`;
+        color = `bg-secondary/10`;
       } else if (period === calendar.examPeriod) {
-        color = `bg-blue-200/30`;
+        // color = `bg-blue-200/30`;
+        color = `bg-secondary/30`;
       }
       const periodEnd = toSydneyPlainDate(period.endDate);
       if (!periodEnd) continue;

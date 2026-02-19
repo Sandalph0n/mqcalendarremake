@@ -98,11 +98,19 @@ const SubjectCalendar = () => {
 
 			let color = "";
 			if (period === calendar.firstHalf || period === calendar.secondHalf) {
-				color = `bg-green-200/30`;
+				// color = `bg-green-200/30`;
+				// color = `bg-gray-300/40`;
+				color = `bg-secondary/20`;
+
+
 			} else if (period === calendar.recess) {
-				color = `bg-yellow-200/30`;
+				// color = `bg-yellow-200/30`;
+				color = `bg-secondary/10`;
+
 			} else if (period === calendar.examPeriod) {
-				color = `bg-blue-200/30`;
+				// color = `bg-blue-200/30`;
+				color = `bg-secondary/30`;
+
 			}
 
 			const startOverlay = lastEndOverlay;
@@ -283,9 +291,9 @@ const SubjectCalendar = () => {
 								</div>
 							);
 
-							if (!hasAssessments) return (
-								React.cloneElement(cellContent, { key: `cell-${rowIdx}-${w.number}` })
-							);
+							if (!hasAssessments) {
+								return (React.cloneElement(cellContent, { key: `cell-${rowIdx}-${w.number}` })
+							);}
 
 							return (
 								<Tooltip key={`cell-${rowIdx}-${w.number}`} delayDuration={0}>

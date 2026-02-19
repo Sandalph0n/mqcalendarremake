@@ -63,7 +63,7 @@ const CalendarPage = () => {
 											</Button>
 										</CardAction>
 									</CardHeader>
-									<CardContent className="p-4">
+									<CardContent className="">
 										<div className="space-y-10">
 											<section className="space-y-4">
 												<div className="space-y-1">

@@ -13,7 +13,7 @@ import { usePlanner } from "@/contexts/PlannerContext";
 import { Temporal } from "temporal-polyfill";
 import { formatDateAU, toSydneyZonedDateTime } from "@/lib/timeUtils";
 import { SUBJECT_PALETTE } from "./SubjectHeatmap";
-import { cn } from "@/lib/utils";
+import { capitalizeWords, cn } from "@/lib/utils";
 
 type WeekRow = {
 	weekNumber: number;
@@ -34,7 +34,7 @@ type WeekRow = {
 
 const SummaryCalendar = () => {
 	const { planner } = usePlanner();
-	console.log(planner)
+	// console.log(planner)
 	const calendar = planner.calendar;
 	const subjects = planner.subjects ?? [];
 
@@ -150,6 +150,8 @@ const SummaryCalendar = () => {
 
 	const hasData = rows.length > 0;
 
+	// console.log(rows)
+
 	return (
 		<Card className="relative w-full overflow-hidden border border-border bg-card text-card-foreground shadow-sm">
 			<div className="absolute inset-0 bg-gradient-to-br from-background via-muted/40 to-background opacity-90 pointer-events-none" />
@@ -184,13 +186,15 @@ const SummaryCalendar = () => {
 													key={`${week.weekNumber}-${idx}`}
 													className="border-t border-border/60 bg-card"
 												>
+
+													{/* Week Label Column */}
 													{isWeekHeader ? (
 														<td
 															className="px-4 py-3 border-r border-border/60 align-middle"
 															rowSpan={week.rows.length}
 														>
 															<div className="flex flex-col items-start justify-center gap-2">
-																<span className="inline-flex w-fit items-center gap-2 rounded-lg bg-primary/15 px-3 py-1 text-xs font-semibold text-primary">
+																<span className="inline-flex w-fit items-center gap-2 rounded-lg bg-background px-3 py-1  font-semibold text-foreground">
 																	{week.weekLabel}
 																</span>
 																{/* <span className="text-[11px] text-muted-foreground">
@@ -199,6 +203,8 @@ const SummaryCalendar = () => {
 															</div>
 														</td>
 													) : null}
+
+													{/* Date Column */}
 													<td className="px-4 py-3 whitespace-nowrap border-r border-border/60 align-middle">
 														{day.date ? (
 															<span className="font-medium">{formatDateAU(day.date)}</span>
@@ -206,14 +212,16 @@ const SummaryCalendar = () => {
 															<span className="text-muted-foreground">—</span>
 														)}
 													</td>
-													<td className="px-4 py-3 align-middle">
+													
+													{/* Event Column */}
+													<td className="px-4 py-3 align-middle ">
 														{day.eventLabel && day.eventLabel.length > 0 ? (
 															<div className="relative inline-flex group">
 																<span
 																	tabIndex={0}
 																	className={cn(
 																		"inline-flex items-center gap-2 rounded-lg px-3 py-1 text-xs font-semibold focus:outline-none",
-																		day.color ? "" : "bg-primary/12 text-primary"
+																		day.color ? "" : "text-foreground text-sm px-0 font-medium"
 																	)}
 																	style={
 																		day.color
@@ -225,15 +233,16 @@ const SummaryCalendar = () => {
 																	}
 																>
 																	{day.subjectCode ? `${day.subjectCode}: ` : ""}
-																	{day.eventLabel}
+																	{capitalizeWords(day.eventLabel)}
 																</span>
+																{/* Tooltips */}
 																{day.color && (
-																	<div className="absolute left-1/2 top-full z-50 hidden w-72 max-w-[18rem] -translate-x-1/2 translate-y-2 rounded-md border border-border bg-card p-3 text-foreground shadow-lg group-hover:block group-focus-within:block ">
+																	<div className="absolute left-1/2 top-full z-50 hidden w-72 max-w-[18rem] -translate-x-1/2 translate-y-2 rounded-md border border-border bg-card p-3 text-foreground shadow-lg group-hover:block group-focus-within:block  ">
 																		<div className="text-xs font-semibold mb-1">
 																			{day.subjectCode ? `${day.subjectCode}: ` : ""}
 																			{day.eventLabel}
 																		</div>
-																		<div className="space-y-1 text-xs text-muted-foreground">
+																		<div className="space-y-1 text-xs text-muted-foreground ">
 																			{day.weighting !== undefined && <div>Weight: {day.weighting ?? 0}%</div>}
 																			{day.isHurdle !== undefined && <div>Hurdle: {day.isHurdle ? "Yes" : "No"}</div>}
 																			{day.isExam && <div>Exam</div>}
