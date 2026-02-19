@@ -12,6 +12,7 @@ import React, { useMemo } from "react";
 import { usePlanner } from "@/contexts/PlannerContext";
 import { Temporal } from "temporal-polyfill";
 import { formatDateAU, toSydneyZonedDateTime } from "@/lib/timeUtils";
+import { capitalizeWords } from "@/lib/utils";
 
 type WeekRow = {
 	weekNumber: number;
@@ -127,7 +128,7 @@ const GenericCalendar = () => {
 															rowSpan={week.rows.length}
 														>
 															<div className="flex flex-col items-start justify-center gap-2">
-																<span className="inline-flex w-fit items-center gap-2 rounded-lg bg-primary/15 px-3 py-1 text-xs font-semibold text-primary">
+																<span className="inline-flex w-fit items-center gap-2 rounded-lg  px-3 py-1  font-semibold ">
 																	{week.weekLabel}
 																</span>
 																{/* <span className="text-[11px] text-muted-foreground">
@@ -145,8 +146,8 @@ const GenericCalendar = () => {
 													</td>
 													<td className="px-4 py-3">
 														{day.eventLabel && day.eventLabel.length > 0 ? (
-															<span className="inline-flex items-center gap-2 rounded-lg bg-primary/12 px-3 py-1 text-xs font-semibold text-primary">
-																{day.eventLabel}
+															<span className="inline-flex items-center gap-2 rounded-lg px-3 py-1 font-medium ">
+																{capitalizeWords(day.eventLabel)}
 															</span>
 														) : (
 															<span className="text-muted-foreground">—</span>
