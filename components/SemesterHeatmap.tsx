@@ -100,7 +100,7 @@ const SemesterCalendar = () => {
       periodOverlay[periodOverlay.length - 1].end = 100;
     }
 
-    const adjustedToday = addTimes(today, { days: -1, hours: -12 }) as Temporal.ZonedDateTime;
+    const adjustedToday = addTimes(today, { days: 0, hours: -12 }) as Temporal.ZonedDateTime;
     const raw = ((adjustedToday.epochMilliseconds - start.epochMilliseconds) / spanMs) * 100;
     todayPercent = Math.max(0, Math.min(100, raw));
   }

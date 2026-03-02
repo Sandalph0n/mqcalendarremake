@@ -69,6 +69,7 @@ const SubjectCalendar = () => {
 	const gridTemplateCols = `${subjectColWidth} ${weekEntries.map(() => "minmax(2rem,1fr)").join(" ") || "1fr"}`;
 	// Change this value to test a different current day if needed
 	const today = Temporal.Now.zonedDateTimeISO(SYDNEY_TZ);
+	// console.log(today.toString())
 	const weightToBg = (weight: number, base: [number, number, number]) => {
 		if (!weight || weight <= 0) return undefined;
 		const capped = Math.min(weight, 60);
@@ -131,7 +132,7 @@ const SubjectCalendar = () => {
 			periodOverlay[periodOverlay.length - 1].end = 100; // ensure the final overlay reaches the end
 		}
 
-		const adjustedToday = addTimes(today, { days: -1, hours: -12 }) as Temporal.ZonedDateTime;
+		const adjustedToday = addTimes(today, { days: 0, hours: -12 }) as Temporal.ZonedDateTime;
 		const raw = ((adjustedToday.epochMilliseconds - start.epochMilliseconds) / spanMs) * 100;
 		todayPercent = Math.max(0, Math.min(100, raw));
 	}
