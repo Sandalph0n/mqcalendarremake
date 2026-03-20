@@ -7,6 +7,7 @@ import { SubjectProps } from '@/contexts/PlannerContext';
 import SubjectCard from './SubjectCard';
 import Link from 'next/link';
 import { nanoid } from 'nanoid';
+import { dateFromSydneyKey, isBetweenDates } from '@/lib/timeUtils';
 const SubjectPlanner = () => {
 	const { planner, setPlanner } = usePlanner();
 
@@ -59,6 +60,33 @@ const SubjectPlanner = () => {
 			const dataWithID = {
 				subject: { ...data.subject, id: nanoid() }
 			}
+
+			for (const asm of dataWithID.subject.assessments ?? []) {
+				const dueText = asm.dueText ?? "";
+				const dateMatch = dueText.match(/\b(0[1-9]|[12][0-9]|3[01])[\/-](0[1-9]|1[0-2])[\/-](\d{4})\b/);
+
+				if (dateMatch) {
+					const [, day, month, year] = dateMatch;
+					const isoDateKey = `${year}-${month}-${day}`;
+					const auDate = dateFromSydneyKey(isoDateKey);
+					const weeks = planner.calendar?.week ?? {};
+					asm.dueDate = isoDateKey;
+					for (const w in weeks) {
+						const startZdt = weeks[w]?.startDate;
+						const endZdt = weeks[w]?.endDate;
+						if (!startZdt || !endZdt || !auDate) continue;
+
+						const start = dateFromSydneyKey(startZdt.toString());
+						const end = dateFromSydneyKey(endZdt.toString());
+						if (start && end && isBetweenDates(start, end, auDate)) {
+							asm.dueWeek = Number(w);
+							break;
+						}
+					}
+
+				}
+			}
+
 			setPlanner(prev => {
 				const subjects = prev?.subjects ?? [];
 				return {
@@ -128,9 +156,9 @@ const SubjectPlanner = () => {
 				{error && <p className='text-destructive text-sm mt-6 text-center font-bold'>{error}</p>}
 
 				{(!planner?.subjects || planner.subjects.length === 0) && !error ?
-						<CardDescription className='text-center mt-6'>Please add some subject to start building your calendar</CardDescription>
-						:
-						<div></div>
+					<CardDescription className='text-center mt-6'>Please add some subject to start building your calendar</CardDescription>
+					:
+					<div></div>
 				}
 				<div className='flex items-center justify-center gap-3 flex-col w-full mt-6'>
 					{planner?.subjects && planner.subjects.length > 0 && (
