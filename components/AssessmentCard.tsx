@@ -108,7 +108,7 @@ const AssessmentCard = ({ assessment, index, unitGuideURL, onChange }: Assessmen
 				</div>
 				{mode === "date" ? (
 					<label className="flex flex-col gap-1 text-xs font-semibold text-muted-foreground">
-						Due date (YYYY-MM-DD)
+						Due date (DD-MM-YYYY)
 						<input
 							type="date"
 							className="w-full rounded-md border px-2 py-2 text-sm bg-background"
